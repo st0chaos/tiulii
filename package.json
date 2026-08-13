@@ -1,0 +1,28 @@
+{
+  "name": "tiulii",
+  "type": "module",
+  "imports": {
+    "#root/*": "./*"
+  },
+  "scripts": {
+    "build": "tsc -p ./server/tsconfig.json && tsc -p ./client/tsconfig.json && node ./build.js"
+  },
+  "dependencies": {
+    "@11ty/gray-matter": "^3.0.0",
+    "@vscode/markdown-it-katex": "^1.1.2",
+    "express": "^5.2.1",
+    "json5": "^2.2.3",
+    "markdown-it": "^15.0.0",
+    "open": "^11.0.0",
+    "rxjs": "^7.8.2",
+    "vscode-languageserver": "^10.1.0",
+    "vscode-languageserver-textdocument": "^1.0.12",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.1.2",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}
