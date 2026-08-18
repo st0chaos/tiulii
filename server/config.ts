@@ -23,6 +23,7 @@ const ConfigSchema = z.object({
         return z.NEVER;
       }
     }),
+  katex: z.record(z.string(), z.any()).default({}),
 });
 
 type Config = z.infer<typeof ConfigSchema>;
