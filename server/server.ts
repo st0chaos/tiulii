@@ -31,7 +31,7 @@ import markdownKaTeX from "@vscode/markdown-it-katex";
 import MarkdownIt from "markdown-it";
 
 const markdownIt = new MarkdownIt();
-markdownIt.use(markdownKaTeX.default);
+markdownIt.use(markdownKaTeX.default, config.katex);
 
 interface State {
   filePath?: string | undefined;
