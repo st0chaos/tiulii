@@ -6,12 +6,12 @@ import type { TextDocumentContentChangeEvent } from "vscode-languageserver/node"
 import assert from "node:assert/strict";
 
 interface Parser {
-  parse(text: string, uri: string, language: string, version: number): string;
+  parse(text: string, version: number, uri: string, language: string): string;
   update(
     changes: TextDocumentContentChangeEvent[],
+    version: number,
     uri: string,
     language: string,
-    version: number,
   ): string;
   close(uri: string, language: string): void;
 }
@@ -23,18 +23,18 @@ namespace MarkdownParser {
   const documentMap = new Map<string, TextDocument>();
 
   export const parser: Parser = {
-    parse(text, uri, language, version) {
+    parse(text, version, uri, language) {
       const document = TextDocument.create(uri, language, version, text);
       documentMap.set(uri, document);
       return markdownIt.render(text);
     },
-    update(changes, uri, _, version) {
+    update(changes, version, uri, _language) {
       const document = documentMap.get(uri);
       assert(document);
       TextDocument.update(document, changes, version);
       return markdownIt.render(document.getText());
     },
-    close(uri, _) {
+    close(uri, _language) {
       documentMap.delete(uri);
     },
   };
@@ -44,18 +44,18 @@ namespace DefaultParser {
   const documentMap = new Map<string, TextDocument>();
 
   export const parser: Parser = {
-    parse(text, uri, language, version) {
+    parse(text, version, uri, language) {
       const document = TextDocument.create(uri, language, version, text);
       documentMap.set(uri, document);
       return `<pre>${document.getText()}</pre>`;
     },
-    update(changes, uri, _, version) {
+    update(changes, version, uri, _language) {
       const document = documentMap.get(uri);
       assert(document);
       TextDocument.update(document, changes, version);
       return `<pre>${document.getText()}</pre>`;
     },
-    close(uri, _) {
+    close(uri, _language) {
       documentMap.delete(uri);
     },
   };
