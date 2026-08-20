@@ -23,7 +23,13 @@ const ConfigSchema = z.object({
         return z.NEVER;
       }
     }),
-  katex: z.record(z.string(), z.any()).default({}),
+  katex: z
+    .record(z.string(), z.any())
+    .default({})
+    // To make things like \gdef work, ensure the "macros" property exists
+    .transform(
+      (katex) => ({ ...{ macros: {} }, ...katex }) as Record<string, any>,
+    ),
 });
 
 type Config = z.infer<typeof ConfigSchema>;
