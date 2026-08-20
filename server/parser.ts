@@ -5,7 +5,7 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import type { TextDocumentContentChangeEvent } from "vscode-languageserver/node";
 import assert from "node:assert/strict";
 
-export interface Parser {
+interface Parser {
   parse(text: string, uri: string, language: string, version: number): string;
   update(
     changes: TextDocumentContentChangeEvent[],
