@@ -9,7 +9,7 @@ const staticDir = join(runtimeDir, staticDirectory);
 rmSync(runtimeDir, { recursive: true, force: true });
 
 await esbuild.build({
-  entryPoints: ["./server/server.ts"],
+  entryPoints: ["./server/index.ts"],
   bundle: true,
   platform: "node",
   target: "node18",
