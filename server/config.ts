@@ -4,7 +4,6 @@ import { join } from "node:path";
 import { env } from "node:process";
 import { serverName } from "./base.js";
 import { z } from "zod";
-import JSON5 from "json5";
 
 const ConfigSchema = z.object({
   port: z.int().default(0),
@@ -56,11 +55,9 @@ const userDirectory: string | undefined = (
 
 async function parseConfig() {
   if (userDirectory === undefined) return await ConfigSchema.parseAsync({});
-  const path = join(userDirectory, "config.json");
-  return await fs
-    .readFile(path, "utf-8")
-    .then((content) => JSON5.parse(content))
-    .then((object) => ConfigSchema.parseAsync(object));
+  const path = join(userDirectory, "config.js");
+  const module = await import(path);
+  return await ConfigSchema.parseAsync(module);
 }
 
 export const config: Config = await parseConfig();
