@@ -44,7 +44,7 @@ class State {
       ...current,
       [uri]: {
         language: language,
-        html: parser.parse(text, uri, language, version),
+        html: parser.parse(text, version, uri, language),
       },
     });
     if (this.activeDocumentURI$.value === undefined) {
@@ -64,7 +64,7 @@ class State {
       ...current,
       [uri]: {
         language: language,
-        html: getParser(language).update(changes, uri, language, version),
+        html: getParser(language).update(changes, version, uri, language),
       },
     });
   }
