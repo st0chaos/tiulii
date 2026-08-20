@@ -1,9 +1,9 @@
 import MarkdownIt from "markdown-it";
-import markdownKaTeX from "@vscode/markdown-it-katex";
 import { config } from "./config.js";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import type { TextDocumentContentChangeEvent } from "vscode-languageserver/node";
 import assert from "node:assert/strict";
+import markdownItKaTeX from "./mdit-katex.js";
 
 interface Parser {
   parse(text: string, version: number, uri: string, language: string): string;
@@ -18,7 +18,7 @@ interface Parser {
 
 namespace MarkdownParser {
   const markdownIt = new MarkdownIt();
-  markdownIt.use(markdownKaTeX.default, config.katex);
+  markdownIt.use(markdownItKaTeX, config.katex);
 
   const documentMap = new Map<string, TextDocument>();
 

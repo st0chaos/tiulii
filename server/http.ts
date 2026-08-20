@@ -9,6 +9,7 @@ import {
 } from "./base.js";
 import { config } from "./config.js";
 import { state } from "./state.js";
+import { cssURL } from "./mdit-katex.js";
 
 function sendEvent(res: ExpressResponse, data: ServerMessage) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
@@ -62,7 +63,7 @@ app.get("/", (_req, res) => {
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" />
+        ${cssURL}
       </head>
       <body><script src="${join(prefix, entryScript)}"></script></body>
     </html>
