@@ -10,7 +10,6 @@
   "dependencies": {
     "@vscode/markdown-it-katex": "^1.1.2",
     "express": "^5.2.1",
-    "json5": "^2.2.3",
     "markdown-it": "^15.0.0",
     "open": "^11.0.0",
     "rxjs": "^7.8.2",
