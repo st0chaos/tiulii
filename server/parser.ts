@@ -4,6 +4,7 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import type { TextDocumentContentChangeEvent } from "vscode-languageserver/node";
 import assert from "node:assert/strict";
 import mdPluginKaTeX from "./md-katex.js";
+import hljs from "highlight.js";
 
 interface Parser {
   parse(text: string, version: number, uri: string, language: string): string;
@@ -17,7 +18,18 @@ interface Parser {
 }
 
 namespace MarkdownParser {
-  const md = new MarkdownIt();
+  const md = new MarkdownIt({
+    highlight(str, lang, _attrs) {
+      if (hljs.getLanguage(lang)) {
+        try {
+          return hljs.highlight(str, { language: lang }).value;
+        } catch (err) {
+          return `Error: ${err}`;
+        }
+      }
+      return "";
+    },
+  });
   md.use(mdPluginKaTeX, config.katex);
 
   const documentMap = new Map<string, TextDocument>();

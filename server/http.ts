@@ -64,6 +64,7 @@ app.get("/", (_req, res) => {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         ${cssURL}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.12.0/styles/default.min.css">
       </head>
       <body><script src="${join(prefix, entryScript)}"></script></body>
     </html>
