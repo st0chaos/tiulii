@@ -1,9 +1,13 @@
 import { fileURLToPath } from "node:url";
 import {
   BehaviorSubject,
+  bufferWhen,
   combineLatest,
   distinctUntilChanged,
   map,
+  Subject,
+  Subscription,
+  timer,
 } from "rxjs";
 import {
   URI,
@@ -16,7 +20,15 @@ import assert from "node:assert";
 interface Document {
   parser: Parser;
   html: string;
-  textDocument?: TextDocument;
+  fullSync?: FullSyncData;
+}
+interface FullSyncData {
+  document: TextDocument;
+  changeEvent$: Subject<ChangeEvent>;
+  subscription: Subscription;
+}
+interface ChangeEvent {
+  changes: TextDocumentContentChangeEvent[];
 }
 
 class State {
@@ -41,30 +53,54 @@ class State {
   }
 
   newDocument(uri: URI, language: string, text: string, version: number) {
-    const current = this.documents$.value;
-    const parser = getParser(language);
-    if (!parser) return;
-    if (!parser.update) {
-      this.documents$.next({
-        ...current,
-        [uri]: {
-          parser,
-          html: parser.parse(text, uri, version),
-          textDocument: TextDocument.create(uri, language, version, text),
-        },
-      });
-    } else {
-      this.documents$.next({
-        ...current,
-        [uri]: {
-          parser,
-          html: parser.parse(text, uri, version),
-        },
-      });
-    }
     if (this.activeURI$.value === undefined) {
       this.activeURI$.next(uri);
     }
+
+    const parser = getParser(language);
+    if (!parser) return;
+
+    if (parser.update) {
+      this.documents$.next({
+        ...this.documents$.value,
+        [uri]: { parser, html: parser.parse(text, uri, version) },
+      });
+      return;
+    }
+
+    let ver = 0;
+    const document = TextDocument.create(uri, language, ver, text);
+    const changeEvent$ = new Subject<ChangeEvent>();
+    const subscription = changeEvent$
+      .pipe(
+        bufferWhen(() => {
+          const size = new TextEncoder().encode(document.getText()).length;
+          if (size < 1024 * 1024 * 8) return timer(20);
+          return timer((size / 1024 ** 2) * 25);
+        }),
+      )
+      .subscribe((events) => {
+        const changes = events.map((ev) => ev.changes).flat();
+        if (changes.length === 0) return;
+        ver++;
+        TextDocument.update(document, changes, ver);
+        this.documents$.next({
+          ...this.documents$.value,
+          [uri]: {
+            ...this.documents$.value[uri]!,
+            html: parser.parse(document.getText(), uri, ver),
+          },
+        });
+      });
+
+    this.documents$.next({
+      ...this.documents$.value,
+      [uri]: {
+        parser,
+        html: parser.parse(text, uri, ver),
+        fullSync: { changeEvent$, document, subscription },
+      },
+    });
   }
 
   updateDocument(
@@ -74,7 +110,7 @@ class State {
   ) {
     const current = this.documents$.value;
     if (current[uri] === undefined) return;
-    const { parser, textDocument: document } = current[uri];
+    const { parser, fullSync } = current[uri];
     if (parser.update) {
       this.documents$.next({
         ...current,
@@ -84,16 +120,8 @@ class State {
         },
       });
     } else {
-      assert(document);
-      TextDocument.update(document, changes, version);
-      this.documents$.next({
-        ...current,
-        [uri]: {
-          parser,
-          textDocument: document,
-          html: parser.parse(document.getText(), uri, version),
-        },
-      });
+      assert(fullSync);
+      fullSync.changeEvent$.next({ changes });
     }
   }
 
@@ -103,9 +131,10 @@ class State {
       this.activeURI$.next(undefined);
     }
 
-    const x = this.documents$.value[uri];
-    if (x === undefined) return;
-    x.parser.close?.(uri);
+    const document = this.documents$.value[uri];
+    if (document === undefined) return;
+    document.fullSync?.subscription.unsubscribe();
+    document.parser.close?.(uri);
 
     const { [uri]: _, ...rest } = this.documents$.value;
     this.documents$.next({ ...rest });
