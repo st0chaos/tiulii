@@ -1,14 +1,10 @@
 #!/usr/bin/env node
-import { Observable } from "rxjs";
 import {
   createConnection,
   NotificationType,
   ProposedFeatures,
   TextDocumentSyncKind,
   URI,
-  type DidChangeTextDocumentParams,
-  type DidCloseTextDocumentParams,
-  type DidOpenTextDocumentParams,
 } from "vscode-languageserver/node";
 import { state } from "./state.js";
 import { serverName } from "./base.js";
@@ -29,38 +25,20 @@ connection.onInitialize((_) => {
   };
 });
 
-const didOpen$ = new Observable<DidOpenTextDocumentParams>((subscriber) => {
-  connection.onDidOpenTextDocument((params) => {
-    subscriber.next(params);
-  });
-  return () => {};
-});
-
-didOpen$.subscribe((params) => {
+connection.onDidOpenTextDocument((params) => {
   const { uri, languageId, text, version } = params.textDocument;
   state.newDocument(uri, languageId, text, version);
 });
 
-const didChange$ = new Observable<DidChangeTextDocumentParams>((subscriber) => {
-  connection.onDidChangeTextDocument((params) => {
-    subscriber.next(params);
-  });
-  return () => {};
+connection.onDidChangeTextDocument((params) => {
+  const {
+    contentChanges,
+    textDocument: { uri, version },
+  } = params;
+  state.updateDocument(contentChanges, uri, version);
 });
 
-didChange$.subscribe((params) => {
-  const { uri, version } = params.textDocument;
-  state.updateDocument(params.contentChanges, uri, version);
-});
-
-const didClose$ = new Observable<DidCloseTextDocumentParams>((subscriber) => {
-  connection.onDidCloseTextDocument((params) => {
-    subscriber.next(params);
-  });
-  return () => {};
-});
-
-didClose$.subscribe((params) => {
+connection.onDidCloseTextDocument((params) => {
   state.closeDocument(params.textDocument.uri);
 });
 
