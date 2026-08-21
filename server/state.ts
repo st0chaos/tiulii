@@ -60,11 +60,12 @@ class State {
     const current = this.documents$.value;
     assert(current[uri] !== undefined);
     const language = current[uri].language;
+    const parser = getParser(language);
     this.documents$.next({
       ...current,
       [uri]: {
         language: language,
-        html: getParser(language).update(changes, version, uri, language),
+        html: parser.update(changes, version, uri, language),
       },
     });
   }
