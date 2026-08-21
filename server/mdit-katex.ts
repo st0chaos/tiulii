@@ -245,9 +245,15 @@ function displayMath(state: StateInline, silent: boolean): boolean {
   return true;
 }
 
-export default function (mdit: MarkdownIt, options?: KatexOptions) {
+export default function (mdit: MarkdownIt, userOptions?: KatexOptions) {
   mdit.inline.ruler.after("escape", "inline_math_rule", inlineMath);
   mdit.inline.ruler.after("escape", "display_math_rule", displayMath);
+
+  // Ensure `macros` property exists so that users can define their own macros
+  const options: KatexOptions = {
+    macros: {},
+    ...userOptions,
+  };
 
   const inlineRenderer = (tokens: readonly Token[], idx: number) => {
     const content = tokens[idx]!.content;
