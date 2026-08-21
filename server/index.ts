@@ -45,7 +45,7 @@ connection.onDidCloseTextDocument((params) => {
 connection.onNotification(
   new NotificationType<{ uri: URI }>(`${serverName}/didChangeView`),
   (params) => {
-    state.activate(params.uri);
+    state.activateURI(params.uri);
   },
 );
 
