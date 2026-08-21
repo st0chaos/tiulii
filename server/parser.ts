@@ -3,7 +3,7 @@ import { config } from "./config.js";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import type { TextDocumentContentChangeEvent } from "vscode-languageserver/node";
 import assert from "node:assert/strict";
-import markdownItKaTeX from "./mdit-katex.js";
+import mdPluginKaTeX from "./md-katex.js";
 
 interface Parser {
   parse(text: string, version: number, uri: string, language: string): string;
@@ -17,8 +17,8 @@ interface Parser {
 }
 
 namespace MarkdownParser {
-  const markdownIt = new MarkdownIt();
-  markdownIt.use(markdownItKaTeX, config.katex);
+  const md = new MarkdownIt();
+  md.use(mdPluginKaTeX, config.katex);
 
   const documentMap = new Map<string, TextDocument>();
 
@@ -26,13 +26,13 @@ namespace MarkdownParser {
     parse(text, version, uri, language) {
       const document = TextDocument.create(uri, language, version, text);
       documentMap.set(uri, document);
-      return markdownIt.render(text);
+      return md.render(text);
     },
     update(changes, version, uri, _language) {
       const document = documentMap.get(uri);
       assert(document);
       TextDocument.update(document, changes, version);
-      return markdownIt.render(document.getText());
+      return md.render(document.getText());
     },
     close(uri, _language) {
       documentMap.delete(uri);

@@ -9,7 +9,7 @@ import {
 } from "./base.js";
 import { config } from "./config.js";
 import { state } from "./state.js";
-import { cssURL } from "./mdit-katex.js";
+import { cssURL } from "./md-katex.js";
 
 function sendEvent(res: ExpressResponse, data: ServerMessage) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
