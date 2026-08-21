@@ -1,5 +1,4 @@
 import { fileURLToPath } from "node:url";
-import assert from "node:assert/strict";
 import {
   BehaviorSubject,
   combineLatest,
@@ -10,23 +9,27 @@ import {
   URI,
   TextDocumentContentChangeEvent,
 } from "vscode-languageserver/node";
-import { getParser } from "./parser.js";
+import { getParser, type Parser } from "./parser.js";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import assert from "node:assert";
+
+interface Document {
+  parser: Parser;
+  html: string;
+  textDocument?: TextDocument;
+}
 
 class State {
-  private documents$: BehaviorSubject<
-    Record<URI, { language: string; html: string }>
-  >;
-  private activeDocumentURI$: BehaviorSubject<string | undefined>;
-  readonly activeDocumentHTML$: BehaviorSubject<string | undefined>;
+  private documents$: BehaviorSubject<Record<URI, Document>>;
+  private activeURI$: BehaviorSubject<string | undefined>;
+  readonly activeHTML$: BehaviorSubject<string | undefined>;
 
   constructor() {
     this.documents$ = new BehaviorSubject({});
-    this.activeDocumentURI$ = new BehaviorSubject<URI | undefined>(undefined);
-    this.activeDocumentHTML$ = new BehaviorSubject<string | undefined>(
-      undefined,
-    );
+    this.activeURI$ = new BehaviorSubject<URI | undefined>(undefined);
+    this.activeHTML$ = new BehaviorSubject<string | undefined>(undefined);
 
-    combineLatest([this.documents$, this.activeDocumentURI$])
+    combineLatest([this.documents$, this.activeURI$])
       .pipe(
         map(([documents, uri]) => {
           if (uri === undefined) return undefined;
@@ -34,21 +37,33 @@ class State {
         }),
         distinctUntilChanged(),
       )
-      .subscribe((html) => this.activeDocumentHTML$.next(html));
+      .subscribe((html) => this.activeHTML$.next(html));
   }
 
   newDocument(uri: URI, language: string, text: string, version: number) {
-    const parser = getParser(language);
     const current = this.documents$.value;
-    this.documents$.next({
-      ...current,
-      [uri]: {
-        language: language,
-        html: parser.parse(text, version, uri, language),
-      },
-    });
-    if (this.activeDocumentURI$.value === undefined) {
-      this.activeDocumentURI$.next(uri);
+    const parser = getParser(language);
+    if (!parser) return;
+    if (!parser.update) {
+      this.documents$.next({
+        ...current,
+        [uri]: {
+          parser,
+          html: parser.parse(text, uri, version),
+          textDocument: TextDocument.create(uri, language, version, text),
+        },
+      });
+    } else {
+      this.documents$.next({
+        ...current,
+        [uri]: {
+          parser,
+          html: parser.parse(text, uri, version),
+        },
+      });
+    }
+    if (this.activeURI$.value === undefined) {
+      this.activeURI$.next(uri);
     }
   }
 
@@ -58,37 +73,52 @@ class State {
     version: number,
   ) {
     const current = this.documents$.value;
-    assert(current[uri] !== undefined);
-    const language = current[uri].language;
-    const parser = getParser(language);
-    this.documents$.next({
-      ...current,
-      [uri]: {
-        language: language,
-        html: parser.update(changes, version, uri, language),
-      },
-    });
+    if (current[uri] === undefined) return;
+    const { parser, textDocument: document } = current[uri];
+    if (parser.update) {
+      this.documents$.next({
+        ...current,
+        [uri]: {
+          parser,
+          html: parser.update(uri, version, changes),
+        },
+      });
+    } else {
+      assert(document);
+      TextDocument.update(document, changes, version);
+      this.documents$.next({
+        ...current,
+        [uri]: {
+          parser,
+          textDocument: document,
+          html: parser.parse(document.getText(), uri, version),
+        },
+      });
+    }
   }
 
   closeDocument(uri: URI) {
     // Clear the document's URI before removing the document
-    if (this.activeDocumentURI$.value === uri) {
-      this.activeDocumentURI$.next(undefined);
+    if (this.activeURI$.value === uri) {
+      this.activeURI$.next(undefined);
     }
+
+    const x = this.documents$.value[uri];
+    if (x === undefined) return;
+    x.parser.close?.(uri);
+
+    const { [uri]: _, ...rest } = this.documents$.value;
+    this.documents$.next({ ...rest });
+  }
+
+  activateURI(uri: URI) {
     if (this.documents$.value[uri]) {
-      const { [uri]: removed, ...rest } = this.documents$.value;
-      this.documents$.next({ ...rest });
+      this.activeURI$.next(uri);
     }
   }
 
-  activate(uri: URI) {
-    if (this.documents$.value[uri]) {
-      this.activeDocumentURI$.next(uri);
-    }
-  }
-
-  get activeDocumentPath() {
-    const uri = this.activeDocumentURI$.value;
+  get activePath() {
+    const uri = this.activeURI$.value;
     if (uri === undefined) return undefined;
     // The URI may be "file://"
     const path = fileURLToPath(uri);

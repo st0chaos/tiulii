@@ -9,7 +9,6 @@ import {
 } from "./base.js";
 import { config } from "./config.js";
 import { state } from "./state.js";
-import { cssURL } from "./md-katex.js";
 
 function sendEvent(res: ExpressResponse, data: ServerMessage) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
@@ -26,7 +25,7 @@ app.get(ssePath, (req, res) => {
     res.write(": heartbeat.\n\n");
   }, 15 * 1000);
 
-  const subscription = state.activeDocumentHTML$.subscribe((html) => {
+  const subscription = state.activeHTML$.subscribe((html) => {
     sendEvent(res, { method: "render", html: html ?? "" });
   });
 
@@ -42,7 +41,7 @@ app.get(ssePath, (req, res) => {
 });
 
 app.get(/\.(png|jpg|jpeg|gif|webp|svg|bmp|ico|avif)$/i, async (req, res) => {
-  const path = state.activeDocumentPath;
+  const path = state.activePath;
   if (!path) return;
   const imagePath = join(dirname(path), req.path);
   res.sendFile(imagePath);
@@ -63,7 +62,7 @@ app.get("/", (_req, res) => {
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        ${cssURL}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css" integrity="sha384-u1zONI5gPXUx0UKI62c75/zww972y0v2rSK5ZYlVdS6xEuWDeZWUI66v6t1gvlXJ" crossorigin="anonymous" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.12.0/styles/default.min.css">
       </head>
       <body><script src="${join(prefix, entryScript)}"></script></body>
