@@ -24,11 +24,17 @@ app.get(SSE_URL, (req, res) => {
     sendEvent(res, { method: "render", html: html ?? "" });
   });
 
+  const scrollSub = state.activeLine$.subscribe((line) => {
+    if (line === undefined) return;
+    sendEvent(res, { method: "scroll", line });
+  });
+
   if (config.css) {
     sendEvent(res, { method: "style", css: config.css });
   }
 
   req.on("close", () => {
+    scrollSub.unsubscribe();
     subscription.unsubscribe();
     clearInterval(heartBeat);
     res.end();
