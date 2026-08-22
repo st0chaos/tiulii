@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { env } from "node:process";
-import { serverName } from "./base.js";
+import { serverName } from "../shared.js";
 import { z } from "zod";
 
 const ConfigSchema = z.object({

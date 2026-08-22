@@ -1,14 +1,9 @@
 import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import express, { type Response as ExpressResponse } from "express";
-import {
-  ssePath,
-  entryScript,
-  staticDirectory,
-  type ServerMessage,
-} from "./base.js";
+import { ssePath, type ServerMessage } from "../shared.js";
 import { config } from "./config.js";
 import { state } from "./state.js";
+import clientJS from "../client.bundle.js";
 
 function sendEvent(res: ExpressResponse, data: ServerMessage) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
@@ -47,13 +42,6 @@ app.get(/\.(png|jpg|jpeg|gif|webp|svg|bmp|ico|avif)$/i, async (req, res) => {
   res.sendFile(imagePath);
 });
 
-const prefix = "/";
-app.use(
-  prefix,
-  express.static(
-    join(dirname(fileURLToPath(import.meta.url)), staticDirectory),
-  ),
-);
 app.get("/", (_req, res) => {
   res.setHeader("Content-Type", "text/html");
   res.send(`
@@ -65,7 +53,7 @@ app.get("/", (_req, res) => {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css" integrity="sha384-u1zONI5gPXUx0UKI62c75/zww972y0v2rSK5ZYlVdS6xEuWDeZWUI66v6t1gvlXJ" crossorigin="anonymous" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.12.0/styles/default.min.css">
       </head>
-      <body><script src="${join(prefix, entryScript)}"></script></body>
+      <body><script>${clientJS}</script></body>
     </html>
   `);
 });
