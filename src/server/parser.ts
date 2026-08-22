@@ -3,7 +3,7 @@ import { config } from "./config.js";
 import type { TextDocumentContentChangeEvent } from "vscode-languageserver/node";
 import markdownKaTeX from "./md-katex.js";
 import hljs from "highlight.js";
-import { LINE_ATTRIBUTE } from "../shared.js";
+import { LINE_BEGIN_ATTR, LINE_END_ATTR } from "../shared.js";
 
 export interface Parser {
   parse(text: string, uri: string, version: number): string;
@@ -35,16 +35,11 @@ namespace MarkdownParser {
     md.core.ruler.push("inject_line", function (state) {
       const tokens = state.tokens;
       for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i]!;
-        if (token.map) {
-          token.attrs = token.attrs || [];
-          const hasLineAttr = token.attrs.some(
-            (attr) => attr[0] === LINE_ATTRIBUTE,
-          );
-          if (!hasLineAttr) {
-            token.attrs.push([LINE_ATTRIBUTE, token.map[0]]);
-          }
-        }
+        const token = tokens[i];
+        if (token === undefined || !token.map) continue;
+        const [beg, end] = token.map;
+        token.attrPush([LINE_BEGIN_ATTR, beg]);
+        token.attrPush([LINE_END_ATTR, end]);
       }
     });
   });

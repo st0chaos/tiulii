@@ -35,11 +35,13 @@ class State {
   private documents$: BehaviorSubject<Record<URI, Document>>;
   private activeURI$: BehaviorSubject<string | undefined>;
   readonly activeHTML$: BehaviorSubject<string | undefined>;
+  activeLine$: BehaviorSubject<number | undefined>;
 
   constructor() {
     this.documents$ = new BehaviorSubject({});
     this.activeURI$ = new BehaviorSubject<URI | undefined>(undefined);
     this.activeHTML$ = new BehaviorSubject<string | undefined>(undefined);
+    this.activeLine$ = new BehaviorSubject<number | undefined>(undefined);
 
     combineLatest([this.documents$, this.activeURI$])
       .pipe(

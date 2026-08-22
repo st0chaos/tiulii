@@ -59,4 +59,11 @@ connection.onNotification(
   },
 );
 
+connection.onNotification(
+  new NotificationType<{ line: number }>(`${SERVER_NAME}/didMoveCursor`),
+  ({ line }) => {
+    state.activeLine$.next(line);
+  },
+);
+
 connection.listen();
