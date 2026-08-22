@@ -7,7 +7,7 @@ import {
   URI,
 } from "vscode-languageserver/node";
 import { state } from "./state.js";
-import { serverName } from "../shared.js";
+import { SERVER_NAME } from "../shared.js";
 import { httpServer } from "./http.js";
 import open from "open";
 
@@ -21,7 +21,7 @@ connection.onInitialize((_) => {
         change: TextDocumentSyncKind.Incremental,
       },
     },
-    serverInfo: { name: serverName },
+    serverInfo: { name: SERVER_NAME },
   };
 });
 
@@ -43,14 +43,14 @@ connection.onDidCloseTextDocument((params) => {
 });
 
 connection.onNotification(
-  new NotificationType<{ uri: URI }>(`${serverName}/didChangeView`),
+  new NotificationType<{ uri: URI }>(`${SERVER_NAME}/didChangeView`),
   (params) => {
     state.activateURI(params.uri);
   },
 );
 
 connection.onNotification(
-  new NotificationType<{}>(`${serverName}/openPreviewURL`),
+  new NotificationType<{}>(`${SERVER_NAME}/openPreviewURL`),
   async (_) => {
     const address = httpServer.address();
     if (address === null) return;

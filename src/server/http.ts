@@ -1,6 +1,6 @@
 import { join, dirname } from "node:path";
 import express, { type Response as ExpressResponse } from "express";
-import { ssePath, type ServerMessage } from "../shared.js";
+import { SSE_URL, type ServerMessage } from "../shared.js";
 import { config } from "./config.js";
 import { state } from "./state.js";
 import clientJS from "../client.bundle.js";
@@ -11,7 +11,7 @@ function sendEvent(res: ExpressResponse, data: ServerMessage) {
 
 const app = express();
 
-app.get(ssePath, (req, res) => {
+app.get(SSE_URL, (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");

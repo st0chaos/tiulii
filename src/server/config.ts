@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { env } from "node:process";
-import { serverName } from "../shared.js";
+import { SERVER_NAME } from "../shared.js";
 import { z } from "zod";
 
 const ConfigSchema = z.object({
@@ -28,10 +28,12 @@ const ConfigSchema = z.object({
 type Config = z.infer<typeof ConfigSchema>;
 
 const possibleUserDirectories: (string | undefined)[] = [
-  env[`${serverName.toUpperCase()}_HOME`],
-  env["XDG_CONFIG_NAME"] ? join(env["XDG_CONFIG_NAME"], serverName) : undefined,
-  env["HOME"] ? join(env["HOME"], `.config/${serverName}`) : undefined,
-  join(homedir(), `.${serverName}`),
+  env[`${SERVER_NAME.toUpperCase()}_HOME`],
+  env["XDG_CONFIG_NAME"]
+    ? join(env["XDG_CONFIG_NAME"], SERVER_NAME)
+    : undefined,
+  env["HOME"] ? join(env["HOME"], `.config/${SERVER_NAME}`) : undefined,
+  join(homedir(), `.${SERVER_NAME}`),
 ];
 
 const userDirectory: string | undefined = (
