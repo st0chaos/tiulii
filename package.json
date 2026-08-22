@@ -1,11 +1,10 @@
 {
   "name": "tiulii",
   "type": "module",
-  "imports": {
-    "#root/*": "./*"
-  },
   "scripts": {
-    "build": "tsc -p ./server/tsconfig.json && tsc -p ./client/tsconfig.json && node ./build.js"
+    "build:client": "tsc -p ./src/client/tsconfig.json && node ./build-client.js",
+    "build:server": "tsc -p ./src/server/tsconfig.json && node ./build-server.js",
+    "build": "npm run build:client && npm run build:server"
   },
   "dependencies": {
     "express": "^5.2.1",

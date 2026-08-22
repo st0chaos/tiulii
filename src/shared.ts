@@ -2,10 +2,6 @@ export const ssePath = "/sse";
 
 export const serverName = "tiulii";
 
-export const staticDirectory = "assets";
-
-export const entryScript = "main.js";
-
 interface ServerMessageRender {
   method: "render";
   html: string;

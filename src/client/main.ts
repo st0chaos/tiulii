@@ -2,7 +2,7 @@ import {
   ssePath,
   type ServerMessage,
   type ServerMessageRegistry,
-} from "#root/server/base.js";
+} from "../shared.js";
 
 const registry: ServerMessageRegistry = {
   render(message) {
