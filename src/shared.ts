@@ -1,6 +1,6 @@
-export const ssePath = "/sse";
+export const SSE_URL = "/sse";
 
-export const serverName = "tiulii";
+export const SERVER_NAME = "tiulii";
 
 interface ServerMessageRender {
   method: "render";

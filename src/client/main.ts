@@ -1,5 +1,5 @@
 import {
-  ssePath,
+  SSE_URL,
   type ServerMessage,
   type ServerMessageRegistry,
 } from "../shared.js";
@@ -21,7 +21,7 @@ const registry: ServerMessageRegistry = {
 const app = document.createElement("div");
 document.body.prepend(app);
 
-const eventSource = new EventSource(ssePath);
+const eventSource = new EventSource(SSE_URL);
 
 eventSource.onerror = (event) => {
   console.error(event);

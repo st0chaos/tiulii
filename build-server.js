@@ -1,7 +1,7 @@
 import * as esbuild from "esbuild";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import { serverName } from "./src/shared.ts";
+import { SERVER_NAME } from "./src/shared.ts";
 
 const dist = "./dist";
 
@@ -16,5 +16,5 @@ await esbuild.build({
   banner: {
     js: `import { createRequire } from 'module';\nconst require = createRequire(import.meta.url);`,
   },
-  outfile: join(dist, serverName),
+  outfile: join(dist, SERVER_NAME),
 });
