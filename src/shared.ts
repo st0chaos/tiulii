@@ -2,6 +2,8 @@ export const SSE_URL = "/sse";
 
 export const SERVER_NAME = "tiulii";
 
+export const LINE_ATTRIBUTE = "data-line";
+
 interface ServerMessageRender {
   method: "render";
   html: string;
