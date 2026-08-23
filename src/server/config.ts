@@ -53,7 +53,7 @@ async function parseConfig() {
   if (userDirectory === undefined) return await ConfigSchema.parseAsync({});
   const path = join(userDirectory, "config.js");
   const module = await import(path);
-  return await ConfigSchema.parseAsync(module);
+  return await ConfigSchema.parseAsync(module.default);
 }
 
 export const config: Config = await parseConfig();
