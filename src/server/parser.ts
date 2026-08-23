@@ -4,6 +4,7 @@ import type { TextDocumentContentChangeEvent } from "vscode-languageserver/node"
 import markdownKaTeX from "./md-katex.js";
 import hljs from "highlight.js";
 import { LINE_BEGIN_ATTR, LINE_END_ATTR } from "../shared.js";
+import matter from "gray-matter";
 
 export interface Parser {
   parse(text: string, uri: string, version: number): string;
@@ -46,7 +47,8 @@ namespace MarkdownParser {
 
   export const parser: Parser = {
     parse(text) {
-      return md.render(text);
+      const { data, content } = matter(text);
+      return `<pre>${JSON.stringify(data, null, 2)}</pre>` + md.render(content);
     },
   };
 }
