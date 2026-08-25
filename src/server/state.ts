@@ -55,6 +55,8 @@ class State {
   }
 
   newDocument(uri: URI, language: string, text: string, version: number) {
+    if (this.documents$.value[uri]) return;
+
     if (this.activeURI$.value === undefined) {
       this.activeURI$.next(uri);
     }
