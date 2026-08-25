@@ -47,8 +47,14 @@ namespace MarkdownParser {
 
   export const parser: Parser = {
     parse(text) {
-      const { data, content } = matter(text);
-      return `<pre>${JSON.stringify(data, null, 2)}</pre>` + md.render(content);
+      try {
+        const { data, content } = matter(text);
+        return (
+          `<pre>${JSON.stringify(data, null, 2)}</pre>` + md.render(content)
+        );
+      } catch (_) {
+        return md.render(text);
+      }
     },
   };
 }
