@@ -13,7 +13,8 @@ import {
   URI,
   TextDocumentContentChangeEvent,
 } from "vscode-languageserver/node";
-import { getParser, type Parser } from "./parser.js";
+import { getParser } from "./parser.js";
+import { type Parser } from "./shared.js";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import assert from "node:assert";
 
