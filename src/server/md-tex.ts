@@ -111,10 +111,36 @@ function mathInlineGithub(state: StateInline, silent: boolean): boolean {
   return true;
 }
 
+function mathDisplayLaTeX(state: StateInline, silent: boolean): boolean {
+  const beg = state.pos;
+  if (state.src.slice(beg, beg + 2) !== "\\[") return false;
+
+  let end = beg;
+  while ((end = state.src.indexOf("\\]", end + 2)) !== -1) {
+    let backslash = 0;
+    for (let pos = end - 1; pos > beg && state.src[pos] === "\\"; pos--) {
+      backslash++;
+    }
+    if (backslash % 2 === 0) {
+      break;
+    }
+  }
+  if (end === -1) return false;
+
+  if (silent) return true;
+  const token = state.push(displayMathTokenType, "math", 0);
+  token.markup = "\\[";
+  token.content = state.src.slice(beg + 2, end);
+  token.block = true;
+  state.pos = end + 2;
+  return true;
+}
+
 export default function (md: MarkdownIt, userOptions?: KatexOptions) {
   md.inline.ruler.after("escape", "math_inline_github", mathInlineGithub);
   md.inline.ruler.after("math_inline_github", "math_inline_tex", mathInlineTeX);
   md.inline.ruler.after("escape", "math_display_tex", mathDisplayTeX);
+  md.inline.ruler.before("escape", "math_display_latex", mathDisplayLaTeX);
 
   // Ensure `macros` property exists so that users can define their own macros
   const options: KatexOptions = {
