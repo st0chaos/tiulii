@@ -54,7 +54,7 @@ class State {
       .subscribe((html) => this.activeHTML$.next(html));
   }
 
-  newDocument(uri: URI, language: string, text: string, version: number) {
+  async newDocument(uri: URI, language: string, text: string, version: number) {
     if (this.documents$.value[uri]) return;
 
     if (this.activeURI$.value === undefined) {
@@ -67,7 +67,7 @@ class State {
     if (parser.update) {
       this.documents$.next({
         ...this.documents$.value,
-        [uri]: { parser, html: parser.parse(text, uri, version) },
+        [uri]: { parser, html: await parser.parse(text, uri, version) },
       });
       return;
     }
@@ -83,7 +83,7 @@ class State {
           return timer((size / 1024 ** 2) * 25);
         }),
       )
-      .subscribe((events) => {
+      .subscribe(async (events) => {
         const changes = events.map((ev) => ev.changes).flat();
         if (changes.length === 0) return;
         ver++;
@@ -92,7 +92,7 @@ class State {
           ...this.documents$.value,
           [uri]: {
             ...this.documents$.value[uri]!,
-            html: parser.parse(document.getText(), uri, ver),
+            html: await parser.parse(document.getText(), uri, ver),
           },
         });
       });
@@ -101,13 +101,13 @@ class State {
       ...this.documents$.value,
       [uri]: {
         parser,
-        html: parser.parse(text, uri, ver),
+        html: await parser.parse(text, uri, ver),
         fullSync: { changeEvent$, document, subscription },
       },
     });
   }
 
-  updateDocument(
+  async updateDocument(
     changes: TextDocumentContentChangeEvent[],
     uri: URI,
     version: number,
@@ -120,7 +120,7 @@ class State {
         ...current,
         [uri]: {
           parser,
-          html: parser.update(uri, version, changes),
+          html: await parser.update(uri, version, changes),
         },
       });
     } else {
