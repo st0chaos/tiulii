@@ -6,7 +6,7 @@ import { LINE_BEGIN_ATTR, LINE_END_ATTR } from "../shared.js";
 import matter from "gray-matter";
 import type { Parser } from "./shared.js";
 
-const md = new MarkdownIt({
+const md = new MarkdownIt("commonmark", {
   highlight(str, lang, _attrs) {
     if (hljs.getLanguage(lang)) {
       try {
