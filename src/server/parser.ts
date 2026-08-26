@@ -1,7 +1,7 @@
 import MarkdownIt from "markdown-it";
 import { config } from "./config.js";
 import type { TextDocumentContentChangeEvent } from "vscode-languageserver/node";
-import markdownKaTeX from "./md-katex.js";
+import markdownKaTeX from "./md-tex.js";
 import hljs from "highlight.js";
 import { LINE_BEGIN_ATTR, LINE_END_ATTR } from "../shared.js";
 import matter from "gray-matter";
