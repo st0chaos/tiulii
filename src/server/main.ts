@@ -7,9 +7,9 @@ import {
   URI,
 } from "vscode-languageserver/node";
 import { state } from "./state.js";
-import { SERVER_NAME } from "@tiulii/shared";
 import { httpServer } from "./http.js";
 import open from "open";
+import { SERVER_NAME } from "@tiulii/shared";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -26,20 +26,15 @@ connection.onInitialize((_) => {
 });
 
 connection.onDidOpenTextDocument((params) => {
-  const { uri, languageId, text, version } = params.textDocument;
-  state.newDocument(uri, languageId, text, version);
+  state.newDocument(params);
 });
 
 connection.onDidChangeTextDocument((params) => {
-  const {
-    contentChanges,
-    textDocument: { uri, version },
-  } = params;
-  state.updateDocument(contentChanges, uri, version);
+  state.updateDocument(params);
 });
 
 connection.onDidCloseTextDocument((params) => {
-  state.closeDocument(params.textDocument.uri);
+  state.closeDocument(params);
 });
 
 connection.onNotification(
