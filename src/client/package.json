@@ -1,0 +1,9 @@
+{
+  "name": "@tiulii/web",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@tiulii/shared": "*"
+  }
+}

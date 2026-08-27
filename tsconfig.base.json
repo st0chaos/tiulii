@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "noEmit": true,
+    "composite": true,
     "strict": true,
     "allowUnusedLabels": false,
     "verbatimModuleSyntax": true,
@@ -13,7 +13,7 @@
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "noUnusedParameters": false,
     "isolatedModules": true,
     "esModuleInterop": true,

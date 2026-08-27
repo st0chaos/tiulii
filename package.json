@@ -1,27 +1,16 @@
 {
   "name": "tiulii",
-  "type": "module",
+  "workspaces": [
+    "src/*"
+  ],
   "scripts": {
-    "build:client": "tsc -p ./src/client/tsconfig.json && node ./build-client.js",
-    "build:server": "tsc -p ./src/server/tsconfig.json && node ./build-server.js",
-    "build": "npm run build:client && npm run build:server"
-  },
-  "dependencies": {
-    "express": "^5.2.1",
-    "gray-matter": "^4.0.3",
-    "highlight.js": "^11.12.0",
-    "katex": "^0.18.4",
-    "markdown-it": "^15.0.0",
-    "open": "^11.0.0",
-    "rxjs": "^7.8.2",
-    "vscode-languageserver": "^10.1.0",
-    "vscode-languageserver-textdocument": "^1.0.12",
-    "zod": "^4.4.3"
+    "build": "npm run build -w ./src/shared && npm run build -w ./src/client && node ./build-client.mjs && npm run build -w ./src/server && node ./build-server.mjs"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^26.1.2",
     "esbuild": "^0.28.2",
-    "typescript": "^7.0.2"
+    "typescript": "6.0.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }
