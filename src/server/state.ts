@@ -12,6 +12,9 @@ import {
 import {
   URI,
   TextDocumentContentChangeEvent,
+  type DidOpenTextDocumentParams,
+  type DidChangeTextDocumentParams,
+  type DidCloseTextDocumentParams,
 } from "vscode-languageserver/node";
 import { getParser } from "./parser.js";
 import { type Parser } from "./shared.js";
@@ -55,7 +58,8 @@ class State {
       .subscribe((html) => this.activeHTML$.next(html));
   }
 
-  async newDocument(uri: URI, language: string, text: string, version: number) {
+  async newDocument(params: DidOpenTextDocumentParams) {
+    const { uri, languageId: language, text, version } = params.textDocument;
     if (this.documents$.value[uri]) return;
 
     if (this.activeURI$.value === undefined) {
@@ -108,11 +112,11 @@ class State {
     });
   }
 
-  async updateDocument(
-    changes: TextDocumentContentChangeEvent[],
-    uri: URI,
-    version: number,
-  ) {
+  async updateDocument(params: DidChangeTextDocumentParams) {
+    const {
+      textDocument: { uri, version },
+      contentChanges: changes,
+    } = params;
     const current = this.documents$.value;
     if (current[uri] === undefined) return;
     const { parser, fullSync } = current[uri];
@@ -130,7 +134,10 @@ class State {
     }
   }
 
-  closeDocument(uri: URI) {
+  closeDocument(params: DidCloseTextDocumentParams) {
+    const {
+      textDocument: { uri },
+    } = params;
     // Clear the document's URI before removing the document
     if (this.activeURI$.value === uri) {
       this.activeURI$.next(undefined);
