@@ -28,8 +28,8 @@ md.use((md) => {
       const token = tokens[i];
       if (token === undefined || !token.map) continue;
       const [beg, end] = token.map;
-      token.attrPush([LINE_BEGIN_ATTR, beg]);
-      token.attrPush([LINE_END_ATTR, end]);
+      token.attrPush([LINE_BEGIN_ATTR, beg.toString()]);
+      token.attrPush([LINE_END_ATTR, end.toString()]);
     }
   });
 });
