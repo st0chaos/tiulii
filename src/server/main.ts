@@ -7,7 +7,7 @@ import {
   URI,
 } from "vscode-languageserver/node";
 import { state } from "./state.js";
-import { SERVER_NAME } from "../shared.js";
+import { SERVER_NAME } from "@tiulii/shared";
 import { httpServer } from "./http.js";
 import open from "open";
 

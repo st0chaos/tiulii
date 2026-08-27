@@ -4,7 +4,7 @@ import {
   LINE_END_ATTR,
   type ServerMessage,
   type ServerMessageRegistry,
-} from "../shared.js";
+} from "@tiulii/shared";
 
 const registry: ServerMessageRegistry = {
   render(message) {
