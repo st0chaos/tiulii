@@ -36,6 +36,16 @@ md.use((md) => {
       const prms: Promise<Replacement> = codeToHtml(code, {
         lang,
         theme: "min-light",
+        transformers: [
+          {
+            pre(hast) {
+              if (token.map) {
+                hast.properties[LINE_BEGIN_ATTR] = token.map[0].toString();
+                hast.properties[LINE_END_ATTR] = token.map[1].toString();
+              }
+            },
+          },
+        ],
       })
         .then((html) => {
           return { content: html, placeholder };
