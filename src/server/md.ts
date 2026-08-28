@@ -1,22 +1,10 @@
 import MarkdownIt from "markdown-it";
 import { config } from "./config.js";
 import markdownKaTeX from "./md-tex.js";
-import hljs from "highlight.js";
 import { LINE_BEGIN_ATTR, LINE_END_ATTR } from "@tiulii/shared";
 import type { Parser } from "./shared.js";
 
-const md = new MarkdownIt("commonmark", {
-  highlight(str, lang, _attrs) {
-    if (hljs.getLanguage(lang)) {
-      try {
-        return hljs.highlight(str, { language: lang }).value;
-      } catch (err) {
-        return `Error: ${err}`;
-      }
-    }
-    return "";
-  },
-});
+const md = new MarkdownIt("commonmark");
 
 md.use(markdownKaTeX, config.katex);
 
