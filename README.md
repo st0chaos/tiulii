@@ -4,9 +4,10 @@
   with **live updates**, and is **configurable** via JavaScript
 - Preview markdown with:
   - Synchronized scrolling between editor and browser
+  - Working well with big files
   - Math rendering via KaTeX
     - Custom KaTeX macros
-  - Syntax highlighting
+  - Syntax highlighting via [shiki](https://shiki.style)
 
 ## Installation
 
@@ -15,15 +16,13 @@ To run `tiulii`, you need install [Node.js](https://nodejs.org).
 ### Build from the source
 
 ```bash
-git clone https://github.com/st0chaos/tiulil.git --depth=1
+git clone https://github.com/st0chaos/tiulii.git --depth=1
 cd tiulii
 npm install
 npm run build
 ln --symbolic "$(realpath ./dist/tiulii)" /path/to/your/bin/tiulii
 # Or you can run directly
 node ./dist/tiulii --stdio
-# Or you can copy tiulii to wherever you want
-cp ./dist/tiulii /path/to/your/bin/tiulii
 ```
 
 ## Usage
