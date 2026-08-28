@@ -1,8 +1,13 @@
 // import type { TextDocumentContentChangeEvent } from "vscode-languageserver";
 
+export interface Replacement {
+  placeholder: string;
+  content: string;
+}
+
 export interface ParseResult {
   html: string;
-  tasks: Promise<{ placeholder: string; content: string }>[];
+  replacements: Promise<Replacement>[];
 }
 
 export interface Parser {
