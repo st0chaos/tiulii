@@ -6,7 +6,7 @@ import {
   TextDocumentSyncKind,
   URI,
 } from "vscode-languageserver/node";
-import { state } from "./state.js";
+import { change$, setActiveURI, close$, open$, currentLine$ } from "./state.js";
 import { httpServer } from "./http.js";
 import open from "open";
 import { SERVER_NAME } from "@tiulii/shared";
@@ -26,21 +26,28 @@ connection.onInitialize((_) => {
 });
 
 connection.onDidOpenTextDocument((params) => {
-  state.newDocument(params);
+  open$.next(params);
 });
 
 connection.onDidChangeTextDocument((params) => {
-  state.updateDocument(params);
+  change$.next(params);
 });
 
 connection.onDidCloseTextDocument((params) => {
-  state.closeDocument(params);
+  close$.next(params);
 });
 
 connection.onNotification(
   new NotificationType<{ uri: URI }>(`${SERVER_NAME}/didChangeView`),
-  (params) => {
-    state.activateURI(params.uri);
+  ({ uri }) => {
+    setActiveURI(uri);
+  },
+);
+
+connection.onNotification(
+  new NotificationType<{ line: number }>(`${SERVER_NAME}/didMoveCursor`),
+  ({ line }) => {
+    currentLine$.next(line);
   },
 );
 
@@ -51,13 +58,6 @@ connection.onNotification(
     if (address === null) return;
     if (typeof address === "string") return;
     await open(`http://127.0.0.1:${address.port}`);
-  },
-);
-
-connection.onNotification(
-  new NotificationType<{ line: number }>(`${SERVER_NAME}/didMoveCursor`),
-  ({ line }) => {
-    state.activeLine$.next(line);
   },
 );
 
