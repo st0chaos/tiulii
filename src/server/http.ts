@@ -2,8 +2,9 @@ import { join, dirname } from "node:path";
 import express, { type Response as ExpressResponse } from "express";
 import { SSE_URL, type ServerMessage } from "@tiulii/shared";
 import { config } from "./config.js";
-import { state } from "./state.js";
+import { currentHTML$, currentLine$, getActiveURI } from "./state.js";
 import clientJS from "./client.bundle.js";
+import { fileURLToPath } from "node:url";
 
 function sendEvent(res: ExpressResponse, data: ServerMessage) {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
@@ -20,11 +21,11 @@ app.get(SSE_URL, (req, res) => {
     res.write(": heartbeat.\n\n");
   }, 15 * 1000);
 
-  const subscription = state.activeHTML$.subscribe((html) => {
-    sendEvent(res, { method: "render", html: html ?? "" });
+  const updateSub = currentHTML$.subscribe((html) => {
+    sendEvent(res, { method: "render", html: html ?? "Null" });
   });
 
-  const scrollSub = state.activeLine$.subscribe((line) => {
+  const scrollSub = currentLine$.subscribe((line) => {
     if (line === undefined) return;
     sendEvent(res, { method: "scroll", line });
   });
@@ -35,14 +36,17 @@ app.get(SSE_URL, (req, res) => {
 
   req.on("close", () => {
     scrollSub.unsubscribe();
-    subscription.unsubscribe();
+    updateSub.unsubscribe();
     clearInterval(heartBeat);
     res.end();
   });
 });
 
 app.get(/\.(png|jpg|jpeg|gif|webp|svg|bmp|ico|avif)$/i, async (req, res) => {
-  const path = state.activePath;
+  const uri = getActiveURI();
+  if (uri === undefined) return undefined;
+  const path = fileURLToPath(uri);
+  if (path === "/") return undefined;
   if (!path) return;
   const imagePath = join(dirname(path), req.path);
   res.sendFile(imagePath);

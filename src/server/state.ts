@@ -1,185 +1,128 @@
-import { fileURLToPath } from "node:url";
 import {
   BehaviorSubject,
   bufferWhen,
   combineLatest,
+  concatMap,
+  debounceTime,
   distinctUntilChanged,
+  endWith,
+  filter,
+  concat,
+  from,
   map,
+  mergeAll,
+  mergeMap,
+  shareReplay,
+  startWith,
   Subject,
-  Subscription,
+  takeUntil,
   timer,
+  Observable,
+  EMPTY,
 } from "rxjs";
 import {
-  URI,
-  TextDocumentContentChangeEvent,
   type DidOpenTextDocumentParams,
   type DidChangeTextDocumentParams,
   type DidCloseTextDocumentParams,
 } from "vscode-languageserver/node";
-import { getParser } from "./parser.js";
-import { type Parser } from "./shared.js";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import assert from "node:assert";
+import { getParser } from "./parser.js";
+import type { Parser } from "./shared.js";
 
-class FullSyncDocument {
-  private version: number = 0;
-  private document: TextDocument;
-  private changes$: Subject<TextDocumentContentChangeEvent[]> = new Subject();
+export const open$ = new Subject<DidOpenTextDocumentParams>();
+export const close$ = new Subject<DidCloseTextDocumentParams>();
+export const change$ = new Subject<DidChangeTextDocumentParams>();
 
-  constructor(
-    uri: string,
-    languageId: string,
-    content: string,
-    handler: (content: string, version: number) => void,
-  ) {
-    this.document = TextDocument.create(uri, languageId, this.version, content);
-    this.changes$
+function parseIntoStream(
+  parser: Parser,
+  content: string,
+  uri: string,
+): Observable<string> {
+  const { html, tasks } = parser.parse(content, uri);
+  return from(tasks).pipe(
+    mergeAll(),
+    map(({ placeholder, content }) => html.replaceAll(placeholder, content)),
+    startWith(html),
+  );
+}
+
+const updates$ = open$.pipe(
+  mergeMap((openParams) => {
+    const { uri, languageId, text } = openParams.textDocument;
+    let version = 0;
+    const textDocument = TextDocument.create(uri, languageId, version, text);
+
+    const parser = getParser(languageId);
+    if (!parser) return EMPTY;
+
+    const closeThis$ = close$.pipe(
+      filter((params) => params.textDocument.uri === uri),
+    );
+
+    const initialUpdates$ = parseIntoStream(parser, text, uri).pipe(
+      map((html) => ({ uri: uri, html: html })),
+    );
+
+    const changeUpdates$ = change$
       .pipe(
+        filter((params) => params.textDocument.uri === uri),
+        map((params) => params.contentChanges),
         bufferWhen(() => {
-          const size = new TextEncoder().encode(this.document.getText()).length;
+          const size = new TextEncoder().encode(textDocument.getText()).length;
           if (size < 1024 * 1024 * 8) return timer(20);
           return timer((size / 1024 ** 2) * 30);
         }),
-      )
-      .subscribe(async (events) => {
-        const changes = events.flat();
-        if (changes.length === 0) return;
-        this.version++;
-        TextDocument.update(this.document, changes, this.version);
-        handler(this.document.getText(), this.version);
-      });
-  }
-  destroy() {
-    this.changes$.complete();
-  }
-  update(change: TextDocumentContentChangeEvent[]) {
-    this.changes$.next(change);
-  }
-}
-
-interface Document {
-  parser: Parser;
-  html: string;
-  fullSync?: FullSyncDocument;
-}
-
-class State {
-  private documents$: BehaviorSubject<Record<URI, Document>>;
-  private activeURI$: BehaviorSubject<string | undefined>;
-  readonly activeHTML$: BehaviorSubject<string | undefined>;
-  activeLine$: BehaviorSubject<number | undefined>;
-
-  constructor() {
-    this.documents$ = new BehaviorSubject({});
-    this.activeURI$ = new BehaviorSubject<URI | undefined>(undefined);
-    this.activeHTML$ = new BehaviorSubject<string | undefined>(undefined);
-    this.activeLine$ = new BehaviorSubject<number | undefined>(undefined);
-
-    combineLatest([this.documents$, this.activeURI$])
-      .pipe(
-        map(([documents, uri]) => {
-          if (uri === undefined) return undefined;
-          return documents[uri]?.html;
+        map((collection) => collection.flat()),
+        filter((changes) => changes.length !== 0),
+        map((changes) => {
+          TextDocument.update(textDocument, changes, version);
+          version++;
+          return textDocument.getText();
         }),
-        distinctUntilChanged(),
+        concatMap((txt) => parseIntoStream(parser, txt, uri)),
+        map((html) => ({ uri: uri, html: html })),
+        takeUntil(closeThis$),
       )
-      .subscribe((html) => this.activeHTML$.next(html));
+      .pipe(endWith({ uri: uri, html: undefined }));
+
+    return concat(initialUpdates$, changeUpdates$);
+  }),
+);
+
+const docs$ = new BehaviorSubject<Record<string, string>>({});
+const uri$ = new BehaviorSubject<string | undefined>(undefined);
+
+updates$.subscribe(({ uri, html }) => {
+  if (html === undefined) {
+    const { [uri]: _, ...rest } = docs$.value;
+    docs$.next({ ...rest });
+    if (uri$.value === uri) {
+      uri$.next(undefined);
+    }
+    return;
   }
 
-  async newDocument(params: DidOpenTextDocumentParams) {
-    const { uri, languageId: language, text, version } = params.textDocument;
-    if (this.documents$.value[uri]) return;
-
-    if (this.activeURI$.value === undefined) {
-      this.activeURI$.next(uri);
-    }
-
-    const parser = getParser(language);
-    if (!parser) return;
-
-    if (parser.update) {
-      this.documents$.next({
-        ...this.documents$.value,
-        [uri]: { parser, html: await parser.parse(text, uri, version) },
-      });
-      return;
-    }
-
-    const fullSync = new FullSyncDocument(uri, language, text, async (text) => {
-      const value = this.documents$.value;
-      this.documents$.next({
-        ...value,
-        [uri]: {
-          ...value[uri]!,
-          html: await parser.parse(text, uri, version),
-        },
-      });
-    });
-
-    this.documents$.next({
-      ...this.documents$.value,
-      [uri]: {
-        parser,
-        fullSync,
-        html: await parser.parse(text, uri, 0),
-      },
-    });
+  docs$.next({ ...docs$.value, [uri]: html });
+  if (uri$.value === undefined) {
+    uri$.next(uri);
   }
+});
 
-  async updateDocument(params: DidChangeTextDocumentParams) {
-    const {
-      textDocument: { uri, version },
-      contentChanges: changes,
-    } = params;
-    const current = this.documents$.value;
-    if (current[uri] === undefined) return;
-    const { parser, fullSync } = current[uri];
-    if (parser.update) {
-      this.documents$.next({
-        ...current,
-        [uri]: {
-          parser,
-          html: await parser.update(uri, version, changes),
-        },
-      });
-    } else {
-      assert(fullSync);
-      fullSync.update(changes);
-    }
-  }
-
-  closeDocument(params: DidCloseTextDocumentParams) {
-    const {
-      textDocument: { uri },
-    } = params;
-    // Clear the document's URI before removing the document
-    if (this.activeURI$.value === uri) {
-      this.activeURI$.next(undefined);
-    }
-
-    const document = this.documents$.value[uri];
-    if (document === undefined) return;
-    document.fullSync?.destroy();
-    document.parser.close?.(uri);
-
-    const { [uri]: _, ...rest } = this.documents$.value;
-    this.documents$.next({ ...rest });
-  }
-
-  activateURI(uri: URI) {
-    if (this.documents$.value[uri]) {
-      this.activeURI$.next(uri);
-    }
-  }
-
-  get activePath() {
-    const uri = this.activeURI$.value;
-    if (uri === undefined) return undefined;
-    // The URI may be "file://"
-    const path = fileURLToPath(uri);
-    if (path === "/") return undefined;
-    return path;
+export function setActiveURI(uri: string) {
+  if (docs$.value[uri]) {
+    uri$.next(uri);
   }
 }
 
-export const state = new State();
+export function getActiveURI() {
+  return uri$.value;
+}
+
+export const currentLine$ = new BehaviorSubject<number | undefined>(undefined);
+
+export const currentHTML$ = combineLatest([docs$, uri$]).pipe(
+  debounceTime(100),
+  map(([docs, uri]) => (uri ? docs[uri] : undefined)),
+  distinctUntilChanged(),
+  shareReplay(1),
+);

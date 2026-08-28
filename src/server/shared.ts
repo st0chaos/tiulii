@@ -1,11 +1,24 @@
-import type { TextDocumentContentChangeEvent } from "vscode-languageserver";
+// import type { TextDocumentContentChangeEvent } from "vscode-languageserver";
+
+export interface ParseResult {
+  html: string;
+  tasks: Promise<{ placeholder: string; content: string }>[];
+}
 
 export interface Parser {
-  parse(text: string, uri: string, version: number): string | Promise<string>;
-  update?(
-    uri: string,
-    version: number,
-    changes: TextDocumentContentChangeEvent[],
-  ): string | Promise<string>;
-  close?(uri: string): void;
+  parse(text: string, uri: string): ParseResult;
+  // close?(uri: string): void;
 }
+
+// export interface IncrementalParser extends Parser {
+//   update(
+//     uri: string,
+//     changes: TextDocumentContentChangeEvent[],
+//     version: number,
+//   ): string;
+// }
+// export namespace IncrementalParser {
+//   export function is(parser: Parser): parser is IncrementalParser {
+//     return "update" in parser;
+//   }
+// }

@@ -35,6 +35,6 @@ md.use((md) => {
 
 export const parser: Parser = {
   parse(text) {
-    return md.render(text);
+    return { html: md.render(text), tasks: [] };
   },
 };
