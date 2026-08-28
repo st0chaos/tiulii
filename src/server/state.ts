@@ -2,7 +2,6 @@ import {
   BehaviorSubject,
   bufferWhen,
   combineLatest,
-  concatMap,
   debounceTime,
   distinctUntilChanged,
   endWith,
@@ -10,7 +9,6 @@ import {
   concat,
   from,
   map,
-  mergeAll,
   mergeMap,
   shareReplay,
   startWith,
@@ -19,6 +17,8 @@ import {
   timer,
   Observable,
   EMPTY,
+  switchMap,
+  scan,
 } from "rxjs";
 import {
   type DidOpenTextDocumentParams,
@@ -38,11 +38,15 @@ function parseIntoStream(
   content: string,
   uri: string,
 ): Observable<string> {
-  const { html, tasks } = parser.parse(content, uri);
-  return from(tasks).pipe(
-    mergeAll(),
-    map(({ placeholder, content }) => html.replaceAll(placeholder, content)),
-    startWith(html),
+  const { html: initialHtml, replacements } = parser.parse(content, uri);
+  return from(replacements).pipe(
+    mergeMap((prms) => from(prms)),
+    scan(
+      (currentHtml, { placeholder, content }) =>
+        currentHtml.replaceAll(placeholder, content),
+      initialHtml,
+    ),
+    startWith(initialHtml),
   );
 }
 
@@ -79,7 +83,7 @@ const updates$ = open$.pipe(
           version++;
           return textDocument.getText();
         }),
-        concatMap((txt) => parseIntoStream(parser, txt, uri)),
+        switchMap((txt) => parseIntoStream(parser, txt, uri)),
         map((html) => ({ uri: uri, html: html })),
         takeUntil(closeThis$),
       )
