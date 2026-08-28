@@ -1,13 +1,15 @@
 {
   "name": "tiulii",
+  "type": "module",
   "workspaces": [
     "src/*"
   ],
   "scripts": {
-    "build": "npm run build -w ./src/shared && npm run build -w ./src/client && node ./scripts/build-client.mjs && npm run build -w ./src/server && node ./scripts/build-server.mjs"
+    "build": "npm run build -w ./src/shared && npm run build -w ./src/client && tsx ./scripts/build-client.ts && npm run build -w ./src/server && tsx ./scripts/build-server.ts"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
+    "tsx": "^4.23.12",
     "typescript": "6.0.3"
   },
   "allowScripts": {
