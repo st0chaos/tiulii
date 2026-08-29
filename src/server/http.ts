@@ -30,8 +30,8 @@ app.get(SSE_URL, (req, res) => {
     sendEvent(res, { method: "scroll", line });
   });
 
-  if (config.css) {
-    sendEvent(res, { method: "style", css: config.css });
+  if (config.cssFile) {
+    sendEvent(res, { method: "style", css: config.cssFile });
   }
 
   req.on("close", () => {

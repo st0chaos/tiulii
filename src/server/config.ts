@@ -5,13 +5,46 @@ import { env } from "node:process";
 import { SERVER_NAME } from "@tiulii/shared";
 import { z } from "zod";
 
+export const markdownConfigSchema = z
+  .object({
+    table: z.boolean().default(false).describe("Enables table support."),
+    strikethrough: z
+      .boolean()
+      .default(false)
+      .describe("Enables strikethrough text support."),
+    math: z
+      .boolean()
+      .default(false)
+      .describe("Enables math rendering support."),
+    highlight: z
+      .boolean()
+      .default(false)
+      .describe("Enables text highlighting support."),
+  })
+  .prefault({})
+  .describe("Configuration options for Markdown extensions.");
+
+export const shikiConfigSchema = z
+  .object({
+    theme: z
+      .string()
+      .default("min-light")
+      .describe("Theme for highlighting. See <https://shiki.style/themes>."),
+  })
+  .prefault({})
+  .describe("Configuration options for Shiki.");
+
 export const configSchema = z.object({
-  port: z.int().default(0),
-  css: z
+  port: z
+    .int()
+    .min(0)
+    .max(65535)
+    .default(0)
+    .describe("Port on which the HTTP server listens."),
+  cssFile: z
     .string()
-    .optional()
     .transform(async (path, ctx) => {
-      if (!path || !userDirectory) return undefined;
+      if (!userDirectory) return undefined;
       try {
         return await fs.readFile(join(userDirectory, path), "utf-8");
       } catch (err) {
@@ -21,8 +54,17 @@ export const configSchema = z.object({
         });
         return z.NEVER;
       }
-    }),
-  katex: z.record(z.string(), z.any()).default({}),
+    })
+    .optional()
+    .describe("Path to the custom CSS file relative to the user directory."),
+  markdown: markdownConfigSchema,
+  shiki: shikiConfigSchema,
+  katex: z
+    .record(z.string(), z.any())
+    .default({})
+    .describe(
+      "KaTeX configuration options. See <https://katex.org/docs/options>.",
+    ),
 });
 
 type Config = z.infer<typeof configSchema>;
