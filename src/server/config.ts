@@ -20,6 +20,10 @@ export const markdownConfigSchema = z
       .boolean()
       .default(false)
       .describe("Enables text highlighting support."),
+    frontMatter: z
+      .boolean()
+      .default(true)
+      .describe("Whether to parse front matter."),
   })
   .prefault({})
   .describe("Configuration options for Markdown extensions.");
