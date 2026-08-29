@@ -78,14 +78,15 @@ return {
 
 ## Configuration
 
-Tiulii tries to read the configuration file `~/.config/tiulii/config.js` which
-should have a default export. Here is a example.
+Tiulii tries to read the configuration file `~/.config/tiulii/config.js`
+which should have a default export.
 
 ```javascript
 export default {
   // Port on which the HTTP server listens.
   port: 0,
-  // Path to your custom CSS, relative to the config directory.
-  css: './style.css',
 }
 ```
+
+For more information about configuration,
+please check [THIS](https://st0chaos.github.io/tiulii).
