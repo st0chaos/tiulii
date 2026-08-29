@@ -5,6 +5,10 @@ on:
     branches:
       - main
       - "ci/*"
+    paths:
+      - src/server/**
+      - src/shared/**
+      - scripts/build-jsonschema.ts
 
 permissions:
   contents: read
