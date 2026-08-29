@@ -6,6 +6,7 @@ import type { Parser, Replacement } from "./shared.js";
 import { bundledLanguages, codeToHtml } from "shiki";
 import assert from "node:assert";
 import { randomUUIDv7 } from "node:crypto";
+import markdownFrontMatter from "./md-fm.js";
 
 const md = new MarkdownIt("commonmark");
 
@@ -25,6 +26,8 @@ md.use((md) => {
 if (config.markdown.table) md.enable("table");
 
 if (config.markdown.strikethrough) md.enable("strikethrough");
+
+if (config.markdown.frontMatter) md.use(markdownFrontMatter);
 
 if (config.markdown.math) md.use(markdownKaTeX, config.katex);
 
