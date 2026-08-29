@@ -1,0 +1,49 @@
+name: Deploy configuration documentation
+
+on:
+  push:
+    branches:
+      - main
+      - "ci/*"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - name: Install json-schema-for-humans
+        run: pip install json-schema-for-humans
+      - name: Install Node.js dependencies
+        run: npm ci
+      - name: Build dependencies
+        run: npm run build:shared
+      - name: Generate documentation
+        run: |
+          mkdir public
+          npx tsx scripts/build-jsonschema.ts --output public/schema.json
+          generate-schema-doc public/schema.json public/index.html
+      - name: Setup pages
+        uses: actions/configure-pages@v6
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: "./public"
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

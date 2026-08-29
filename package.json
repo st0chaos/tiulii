@@ -5,7 +5,8 @@
     "src/*"
   ],
   "scripts": {
-    "build": "npm run build -w ./src/shared && npm run build -w ./src/client && tsx ./scripts/build-client.ts && npm run build -w ./src/server && tsx ./scripts/build-server.ts"
+    "build:shared": "npm run build -w ./src/shared",
+    "build": "npm run build:shared && npm run build -w ./src/client && tsx ./scripts/build-client.ts && npm run build -w ./src/server && tsx ./scripts/build-server.ts"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
