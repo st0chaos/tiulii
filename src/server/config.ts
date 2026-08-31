@@ -7,19 +7,22 @@ import { z } from "zod";
 
 export const markdownConfigSchema = z
   .object({
-    table: z.boolean().default(false).describe("Enables table support."),
+    table: z
+      .boolean()
+      .default(false)
+      .describe("Whether to enable table support."),
     strikethrough: z
       .boolean()
       .default(false)
-      .describe("Enables strikethrough text support."),
+      .describe("Whether to enable strikethrough text formatting."),
     math: z
       .boolean()
       .default(false)
-      .describe("Enables math rendering support."),
+      .describe("Whether to enable math rendering."),
     highlight: z
       .boolean()
       .default(false)
-      .describe("Enables text highlighting support."),
+      .describe("Whether to enable text highlighting."),
     frontMatter: z
       .boolean()
       .default(true)
@@ -38,38 +41,40 @@ export const shikiConfigSchema = z
   .prefault({})
   .describe("Configuration options for Shiki.");
 
-export const configSchema = z.object({
-  port: z
-    .int()
-    .min(0)
-    .max(65535)
-    .default(0)
-    .describe("Port on which the HTTP server listens."),
-  cssFile: z
-    .string()
-    .transform(async (path, ctx) => {
-      if (!userDirectory) return undefined;
-      try {
-        return await fs.readFile(join(userDirectory, path), "utf-8");
-      } catch (err) {
-        ctx.addIssue({
-          code: "custom",
-          message: `Failed to read file: ${err}`,
-        });
-        return z.NEVER;
-      }
-    })
-    .optional()
-    .describe("Path to the custom CSS file relative to the user directory."),
-  markdown: markdownConfigSchema,
-  shiki: shikiConfigSchema,
-  katex: z
-    .record(z.string(), z.any())
-    .default({})
-    .describe(
-      "KaTeX configuration options. See <https://katex.org/docs/options>.",
-    ),
-});
+export const configSchema = z
+  .object({
+    port: z
+      .int()
+      .min(0)
+      .max(65535)
+      .default(0)
+      .describe("Port on which the HTTP server listens."),
+    cssFile: z
+      .string()
+      .transform(async (path, ctx) => {
+        if (!userDirectory) return undefined;
+        try {
+          return await fs.readFile(join(userDirectory, path), "utf-8");
+        } catch (err) {
+          ctx.addIssue({
+            code: "custom",
+            message: `Failed to read file: ${err}`,
+          });
+          return z.NEVER;
+        }
+      })
+      .optional()
+      .describe("Path to the custom CSS file relative to the user directory."),
+    markdown: markdownConfigSchema,
+    shiki: shikiConfigSchema,
+    katex: z
+      .record(z.string(), z.any())
+      .default({})
+      .describe(
+        "KaTeX configuration options. See <https://katex.org/docs/options>.",
+      ),
+  })
+  .describe("Configuration options for tiulii.");
 
 type Config = z.infer<typeof configSchema>;
 
