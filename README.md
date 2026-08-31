@@ -1,37 +1,38 @@
 # Tiulii
 
-- Tiulii is an LSP server that lets you preview files in your browser
-  with **live updates**, and is **configurable** via JavaScript
-- Preview markdown with:
-  - Synchronized scrolling between editor and browser
-  - Working well with big files
-  - Math rendering via KaTeX
-    - Custom KaTeX macros
-  - Syntax highlighting via [shiki](https://shiki.style)
+> An LSP server that bridges your editor and browser for real-time file previewing,
+> built for extensibility.
+
+## Features
+
+- **Live Updates:** Instant reflection of changes in your browser as you type.
+- **JavaScript Configurable:** Tailor behavior to your workflow using standard JS.
+- **Markdown previewing:**
+  - Synchronized scrolling between your editor and browser.
+  - Math support via [KaTeX](https://katex.org) with custom macro support.
+  - Syntax highlighting powered by [Shiki](https://shiki.style).
 
 ## Installation
 
-To run `tiulii`, you need install [Node.js](https://nodejs.org).
+### Build from source
 
-### Build from the source
+Ensure you have [Node.js](https://nodejs.org) installed, then build from source:
 
 ```bash
 git clone https://github.com/st0chaos/tiulii.git --depth=1
 cd tiulii
 npm install
 npm run build
+
+# Link to your system path (or run directly via node ./dist/tiulii --stdio)
 ln --symbolic "$(realpath ./dist/tiulii)" /path/to/your/bin/tiulii
-# Or you can run directly
-node ./dist/tiulii --stdio
 ```
 
 ## Usage
 
 ### Neovim 0.11+
 
-Copy the configuration below to `.config/nvim/lsp/tiulii.lua`,
-or you can configure tiulii via `vim.lsp.config({ ... })`,
-then enable the LSP server `vim.lsp.enable('tiulii')` in your init file.
+Create the configuration file at `.config/nvim/lsp/tiulii.lua`:
 
 ```lua
 local server_name = 'tiulii'
@@ -76,17 +77,28 @@ return {
 }
 ```
 
+Then, enable the server in your init file:
+
+```lua
+vim.lsp.enable('tiulii')
+```
+
 ## Configuration
 
-Tiulii tries to read the configuration file `~/.config/tiulii/config.js`
-which should have a default export.
+Tiulii looks for a JavaScript configuration file with a default export at
+
+- `$TIULII_HOME/config.js`
+- `$XDG_CONFIG_NAME/tiulii/config.js`
+- `~/.config/tiulii/config.js`
+- `~/.tiulii/config.js`
+
+For example,
 
 ```javascript
 export default {
-  // Port on which the HTTP server listens.
-  port: 0,
+  port: 8000 // Port on which the HTTP server listens.
 }
 ```
 
-For more information about configuration,
-please check [THIS](https://st0chaos.github.io/tiulii).
+For more configuration options,
+visit the [Documentation](https://st0chaos.github.io/tiulii).
