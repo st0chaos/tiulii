@@ -9,7 +9,7 @@ export const markdownConfigSchema = z
   .object({
     table: z
       .boolean()
-      .default(false)
+      .default(true)
       .describe("Whether to enable table support."),
     strikethrough: z
       .boolean()
