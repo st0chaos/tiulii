@@ -3,6 +3,8 @@
 > An LSP server that bridges your editor and browser for real-time file previewing,
 > built for extensibility.
 
+![Screenshot showing tiulii works with neovim and firefox](assets/screenshot.png)
+
 ## Features
 
 - **Live Updates:** Instant reflection of changes in your browser as you type.
