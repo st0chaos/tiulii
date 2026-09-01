@@ -1,12 +1,10 @@
-import MarkdownIt, { type Env } from "markdown-it";
+import MarkdownIt from "markdown-it";
 import { config } from "./config.js";
 import markdownKaTeX from "./md-tex.js";
 import { LINE_BEGIN_ATTR, LINE_END_ATTR } from "@tiulii/shared";
-import type { Parser, Replacement } from "./shared.js";
-import { bundledLanguages, codeToHtml } from "shiki";
-import assert from "node:assert";
-import { randomUUIDv7 } from "node:crypto";
+import type { MarkdownParsingEnv, Parser } from "./shared.js";
 import markdownFrontMatter from "./md-fm.js";
+import markdownShiki from "./md-shiki.js";
 
 const md = new MarkdownIt("commonmark");
 
@@ -31,55 +29,7 @@ if (config.markdown.frontMatter) md.use(markdownFrontMatter);
 
 if (config.markdown.math) md.use(markdownKaTeX, config.katex);
 
-if (config.markdown.highlight) {
-  md.use((md) => {
-    const original = md.renderer.rules["fence"];
-    md.renderer.rules["fence"] = (tokens, idx, options, env, renderer) => {
-      const token = tokens[idx]!;
-      const code = token.content.trim();
-      const lang = token.info;
-      if (lang in bundledLanguages) {
-        assert(MarkdownParsingEnv.is(env));
-        const placeholder = `<pre id="${randomUUIDv7()}">Waiting for rendering...</pre>`;
-        const prms: Promise<Replacement> = codeToHtml(code, {
-          lang,
-          theme: config.shiki.theme,
-          transformers: [
-            {
-              pre(hast) {
-                if (token.map) {
-                  hast.properties[LINE_BEGIN_ATTR] = token.map[0].toString();
-                  hast.properties[LINE_END_ATTR] = token.map[1].toString();
-                }
-              },
-            },
-          ],
-        })
-          .then((html) => {
-            return { content: html, placeholder };
-          })
-          .catch((err) => {
-            return { content: `<span>${err}</span>`, placeholder };
-          });
-        env.replacements.push(prms);
-        return placeholder;
-      }
-      if (original) {
-        return original(tokens, idx, options, env, renderer);
-      }
-      return "";
-    };
-  });
-}
-
-interface MarkdownParsingEnv extends Env {
-  replacements: Promise<Replacement>[];
-}
-namespace MarkdownParsingEnv {
-  export function is(env: any): env is MarkdownParsingEnv {
-    return "replacements" in env;
-  }
-}
+if (config.markdown.highlight) md.use(markdownShiki);
 
 export const parser: Parser = {
   parse(text) {
