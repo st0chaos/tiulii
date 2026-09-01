@@ -6,7 +6,7 @@ on:
       - main
       - "ci/*"
     paths:
-      - src/server/**
+      - src/server/config.ts
       - src/shared/**
       - scripts/build-jsonschema.ts
 
