@@ -6,18 +6,26 @@ import {
   type ServerMessageRegistry,
 } from "@tiulii/shared";
 
+const app = document.createElement("div");
+document.body.prepend(app);
+
 const registry: ServerMessageRegistry = {
+  init(message) {
+    if (message.css) {
+      const style = document.createElement("style");
+      style.textContent = message.css;
+      document.head.append(style);
+    }
+  },
+
   render(message) {
     app.innerHTML = message.html;
   },
+
   log(message) {
     console.log(message.message);
   },
-  style(message) {
-    const style = document.createElement("style");
-    style.textContent = message.css;
-    document.head.append(style);
-  },
+
   scroll(message) {
     let target;
     let ratio = 0;
@@ -47,9 +55,6 @@ const registry: ServerMessageRegistry = {
     }
   },
 };
-
-const app = document.createElement("div");
-document.body.prepend(app);
 
 const eventSource = new EventSource(SSE_URL);
 
