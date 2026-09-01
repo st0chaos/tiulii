@@ -1,14 +1,15 @@
 export const SSE_URL = "/sse";
 
+export const INIT_URL = "/init";
+
 export const SERVER_NAME = "tiulii";
 
 export const LINE_BEGIN_ATTR = "src-line-begin";
 
 export const LINE_END_ATTR = "src-line-end";
 
-interface ServerMessageInit {
-  method: "init";
-  css?: string | undefined;
+export interface InitalizationMessage {
+  metadata: string[];
 }
 
 interface ServerMessageRender {
@@ -27,10 +28,7 @@ interface ServerMessageScroll {
 }
 
 export type ServerMessage =
-  | ServerMessageInit
-  | ServerMessageRender
-  | ServerMessageLog
-  | ServerMessageScroll;
+  ServerMessageRender | ServerMessageLog | ServerMessageScroll;
 
 export type ServerMessageByMethod<M extends ServerMessage["method"]> = Extract<
   ServerMessage,

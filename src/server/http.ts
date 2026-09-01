@@ -1,6 +1,11 @@
 import { join, dirname } from "node:path";
 import express, { type Response as ExpressResponse } from "express";
-import { SSE_URL, type ServerMessage } from "@tiulii/shared";
+import {
+  INIT_URL,
+  SSE_URL,
+  type InitalizationMessage,
+  type ServerMessage,
+} from "@tiulii/shared";
 import { config } from "./config.js";
 import { currentHTML$, currentLine$, getActiveURI } from "./state.js";
 import clientJS from "./client.bundle.js";
@@ -12,15 +17,21 @@ function sendEvent(res: ExpressResponse, data: ServerMessage) {
 
 const app = express();
 
+app.get(INIT_URL, (req, res) => {
+  const metadata: string[] = [];
+  if (config.cssFile) metadata.push(`<style>${config.cssFile}</style>`);
+
+  const message: InitalizationMessage = {
+    metadata: metadata,
+  };
+  res.json(message);
+  req.on("close", () => res.end());
+});
+
 app.get(SSE_URL, (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
-
-  sendEvent(res, {
-    method: "init",
-    css: config.cssFile,
-  });
 
   const heartBeat = setInterval(() => {
     res.write(": heartbeat.\n\n");
