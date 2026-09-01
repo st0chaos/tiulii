@@ -71,4 +71,7 @@ export default function (md: MarkdownIt) {
   md.block.ruler.before("code", "front_matter", parseFrontMatter, {
     alt: ["paragraph", "reference", "blockquote"],
   });
+  md.renderer.rules[frontMatterTokenType] = () => {
+    return "";
+  };
 }
