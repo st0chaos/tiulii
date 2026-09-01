@@ -20,6 +20,10 @@ const app = express();
 app.get(INIT_URL, (req, res) => {
   const metadata: string[] = [];
   if (config.cssFile) metadata.push(`<style>${config.cssFile}</style>`);
+  if (config.markdown.math)
+    metadata.push(
+      '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css" integrity="sha384-u1zONI5gPXUx0UKI62c75/zww972y0v2rSK5ZYlVdS6xEuWDeZWUI66v6t1gvlXJ" crossorigin="anonymous" />',
+    );
 
   const message: InitalizationMessage = {
     metadata: metadata,
@@ -72,7 +76,6 @@ app.get("/", (_req, res) => {
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css" integrity="sha384-u1zONI5gPXUx0UKI62c75/zww972y0v2rSK5ZYlVdS6xEuWDeZWUI66v6t1gvlXJ" crossorigin="anonymous" />
       </head>
       <body><script>${clientJS}</script></body>
     </html>
