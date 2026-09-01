@@ -17,6 +17,11 @@ app.get(SSE_URL, (req, res) => {
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
+  sendEvent(res, {
+    method: "init",
+    css: config.cssFile,
+  });
+
   const heartBeat = setInterval(() => {
     res.write(": heartbeat.\n\n");
   }, 15 * 1000);
@@ -29,10 +34,6 @@ app.get(SSE_URL, (req, res) => {
     if (line === undefined) return;
     sendEvent(res, { method: "scroll", line });
   });
-
-  if (config.cssFile) {
-    sendEvent(res, { method: "style", css: config.cssFile });
-  }
 
   req.on("close", () => {
     scrollSub.unsubscribe();
