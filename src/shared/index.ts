@@ -1,6 +1,6 @@
-export const SSE_URL = "/sse";
+export const SSE_URL = "/api/sse";
 
-export const INIT_URL = "/init";
+export const INIT_URL = "/api/init";
 
 export const SERVER_NAME = "tiulii";
 
