@@ -8,7 +8,6 @@ import {
 } from "@tiulii/shared";
 import { config } from "./config.js";
 import { currentHTML$, currentLine$, getActiveURI } from "./state.js";
-import clientJS from "./client.bundle.js";
 import { fileURLToPath } from "node:url";
 
 function sendEvent(res: ExpressResponse, data: ServerMessage) {
@@ -68,6 +67,8 @@ app.get(/\.(png|jpg|jpeg|gif|webp|svg|bmp|ico|avif)$/i, async (req, res) => {
   res.sendFile(imagePath);
 });
 
+app.use(express.static(import.meta.dirname));
+
 app.get("/", (_req, res) => {
   res.setHeader("Content-Type", "text/html");
   res.send(`
@@ -77,7 +78,7 @@ app.get("/", (_req, res) => {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body><script>${clientJS}</script></body>
+      <body><script src="/index.js"></script></body>
     </html>
   `);
 });

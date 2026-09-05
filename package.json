@@ -1,19 +1,17 @@
 {
   "name": "tiulii",
+  "version": "0.1.0",
   "type": "module",
   "workspaces": [
     "src/*"
   ],
   "scripts": {
+    "build": "npm run build:shared && npm run build -w ./src/client && npm run build -w ./src/server",
     "build:shared": "npm run build -w ./src/shared",
-    "build": "npm run build:shared && npm run build -w ./src/client && tsx ./scripts/build-client.ts && npm run build -w ./src/server && tsx ./scripts/build-server.ts"
+    "bundle": "npm run build && node ./scripts/bundle.ts"
   },
   "devDependencies": {
-    "esbuild": "^0.28.2",
-    "tsx": "^4.23.12",
+    "rolldown": "^1.2.7",
     "typescript": "6.0.3"
-  },
-  "allowScripts": {
-    "esbuild@0.28.2": true
   }
 }
