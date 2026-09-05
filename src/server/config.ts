@@ -27,6 +27,10 @@ export const markdownConfigSchema = z
       .boolean()
       .default(true)
       .describe("Whether to parse front matter."),
+    attribute: z
+      .boolean()
+      .default(false)
+      .describe("Whether to parse attributes in curly brackets."),
   })
   .prefault({})
   .describe("Configuration options for Markdown extensions.");
