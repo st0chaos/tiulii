@@ -1,5 +1,4 @@
-import { join, dirname } from "node:path";
-import express, { type Response as ExpressResponse } from "express";
+import { join, dirname, extname } from "node:path";
 import {
   INIT_URL,
   SSE_URL,
@@ -8,15 +7,19 @@ import {
 } from "@tiulii/shared";
 import { config } from "./config.js";
 import { currentHTML$, currentLine$, getActiveURI } from "./state.js";
+import { Hono } from "hono";
+import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { SSEStreamingApi, streamSSE } from "hono/streaming";
 import { fileURLToPath } from "node:url";
+import { Readable } from "node:stream";
+import { createReadStream } from "node:fs";
+import { access } from "node:fs/promises";
+import constants from "node:constants";
 
-function sendEvent(res: ExpressResponse, data: ServerMessage) {
-  res.write(`data: ${JSON.stringify(data)}\n\n`);
-}
+const app = new Hono();
 
-const app = express();
-
-app.get(INIT_URL, (req, res) => {
+app.get(INIT_URL, (c) => {
   const metadata: string[] = [];
   if (config.cssFile) metadata.push(`<style>${config.cssFile}</style>`);
   if (config.markdown.math)
@@ -27,60 +30,79 @@ app.get(INIT_URL, (req, res) => {
   const message: InitalizationMessage = {
     metadata: metadata,
   };
-  res.json(message);
-  req.on("close", () => res.end());
+  return c.json(message);
 });
 
-app.get(SSE_URL, (req, res) => {
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
+app.get(SSE_URL, async (c) => {
+  function sendEvent(res: SSEStreamingApi, data: ServerMessage) {
+    res.writeSSE({ data: JSON.stringify(data) });
+  }
 
-  const heartBeat = setInterval(() => {
-    res.write(": heartbeat.\n\n");
-  }, 15 * 1000);
+  return streamSSE(c, async (stream) => {
+    const heartBeat = setInterval(() => {
+      stream.write(": heartbeat.\n\n");
+    }, 15 * 1000);
 
-  const updateSub = currentHTML$.subscribe((html) => {
-    sendEvent(res, { method: "render", html: html ?? "Null" });
-  });
+    const updateSub = currentHTML$.subscribe((html) => {
+      sendEvent(stream, { method: "render", html: html ?? "Null" });
+    });
 
-  const scrollSub = currentLine$.subscribe((line) => {
-    if (line === undefined) return;
-    sendEvent(res, { method: "scroll", line });
-  });
+    const scrollSub = currentLine$.subscribe((line) => {
+      if (line === undefined) return;
+      sendEvent(stream, { method: "scroll", line });
+    });
 
-  req.on("close", () => {
-    scrollSub.unsubscribe();
-    updateSub.unsubscribe();
-    clearInterval(heartBeat);
-    res.end();
+    await new Promise<void>((resolve) =>
+      stream.onAbort(() => {
+        scrollSub.unsubscribe();
+        updateSub.unsubscribe();
+        clearInterval(heartBeat);
+        resolve();
+      }),
+    );
   });
 });
 
-app.get(/\.(png|jpg|jpeg|gif|webp|svg|bmp|ico|avif)$/i, async (req, res) => {
-  const uri = getActiveURI();
-  if (uri === undefined) return undefined;
-  const path = fileURLToPath(uri);
-  if (path === "/") return undefined;
-  if (!path) return;
-  const imagePath = join(dirname(path), req.path);
-  res.sendFile(imagePath);
-});
+const scriptURL = "/static/index.js";
 
-app.use(express.static(import.meta.dirname));
+app.use(
+  scriptURL,
+  serveStatic({
+    path: join(dirname(import.meta.filename), "index.js"),
+  }),
+);
 
-app.get("/", (_req, res) => {
-  res.setHeader("Content-Type", "text/html");
-  res.send(`
+app.get("/", (c) => {
+  return c.html(`
     <!doctype html>
     <html>
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body><script src="/index.js"></script></body>
+      <body><script src="${scriptURL}"></script></body>
     </html>
   `);
 });
 
-export const httpServer = app.listen(config.port);
+app.get(":image{.+\\.(?:png|jpeg|gif|webp|bmp|avif|tiff)$}", async (c) => {
+  const activeURI = getActiveURI();
+  if (activeURI === undefined) return c.notFound();
+  const activePath = fileURLToPath(activeURI);
+  if (activePath === "/") return c.notFound();
+  const imagePath = c.req.param("image");
+  const extension = extname(imagePath).slice(1);
+  const filePath = join(dirname(activePath), imagePath);
+  try {
+    await access(filePath, constants.F_OK);
+    c.header("Content-Type", `image/${extension}`);
+    return c.body(Readable.toWeb(createReadStream(filePath)));
+  } catch {
+    return c.notFound();
+  }
+});
+
+export const httpServer = serve({
+  fetch: app.fetch,
+  port: config.port,
+});

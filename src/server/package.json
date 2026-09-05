@@ -6,8 +6,9 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@hono/node-server": "^2.1.1",
     "@tiulii/shared": "*",
-    "express": "^5.2.1",
+    "hono": "^4.13.7",
     "katex": "^0.18.4",
     "markdown-it": "^15.0.0",
     "markdown-it-attrs": "^5.0.1",
@@ -19,7 +20,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
     "@types/node": "^26.4.0"
   }
 }
