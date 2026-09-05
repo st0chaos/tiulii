@@ -5,6 +5,7 @@ import { LINE_BEGIN_ATTR, LINE_END_ATTR } from "@tiulii/shared";
 import type { MarkdownParsingEnv, Parser } from "./shared.js";
 import markdownFrontMatter from "./md-fm.js";
 import markdownShiki from "./md-shiki.js";
+import markdownItAttrs from "markdown-it-attrs";
 
 const md = new MarkdownIt("commonmark");
 
@@ -30,6 +31,8 @@ if (config.markdown.frontMatter) md.use(markdownFrontMatter);
 if (config.markdown.math) md.use(markdownKaTeX, config.katex);
 
 if (config.markdown.highlight) md.use(markdownShiki);
+
+if (config.markdown.attribute) md.use(markdownItAttrs);
 
 export const parser: Parser = {
   parse(text) {
