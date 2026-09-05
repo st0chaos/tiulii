@@ -1,16 +1,17 @@
-# Tiulii
+# tiulii
 
-> An LSP server that bridges your editor and browser for real-time file previewing,
-> built for extensibility.
+> An LSP server that bridges your editor and browser for real-time file previewing.
 
 ![Screenshot showing tiulii works with neovim and firefox](assets/screenshot.png)
 
 ## Features
 
-- **Live Updates:** Instant reflection of changes in your browser as you type.
-- **JavaScript Configurable:** Tailor behavior to your workflow using standard JS.
-- **Markdown previewing:**
-  - Synchronized scrolling between your editor and browser.
+- Lively update changes in your browser as you type.
+- Configurable using JavaScript.
+- Preview Markdown:
+  - Base on CommonMark with extensible supports for tables, strikethrough,
+    front matter, and attributes.
+  - Synchronized scrolling.
   - Math support via [KaTeX](https://katex.org) with custom macro support.
   - Syntax highlighting powered by [Shiki](https://shiki.style).
 
