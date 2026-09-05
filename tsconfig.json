@@ -1,4 +1,7 @@
 {
+  "compilerOptions": {
+    "types": ["node"]
+  },
   "references": [
     { "path": "./src/shared" },
     { "path": "./src/client" },

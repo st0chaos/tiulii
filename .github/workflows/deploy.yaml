@@ -6,9 +6,8 @@ on:
       - main
       - "ci/*"
     paths:
-      - src/server/config.ts
+      - src/server/**
       - src/shared/**
-      - scripts/build-jsonschema.ts
 
 permissions:
   contents: read
@@ -38,12 +37,11 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
       - name: Build dependencies
-        run: npm run build:shared
+        run: npm run build
       - name: Generate documentation
         run: |
           mkdir public
-          node scripts/build-jsonschema.ts --output public/schema.json
-          generate-schema-doc public/schema.json public/index.html
+          generate-schema-doc src/server/dist/schema.json public/index.html
       - name: Setup pages
         uses: actions/configure-pages@v6
       - name: Upload artifact

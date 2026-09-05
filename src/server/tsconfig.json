@@ -5,6 +5,7 @@
     "noEmit": true,
     "module": "nodenext",
     "moduleResolution": "nodenext",
+    "rewriteRelativeImportExtensions": true,
     "lib": ["esnext"],
     "types": ["node"]
   }

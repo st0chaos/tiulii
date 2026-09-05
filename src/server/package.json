@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "npm run build:tsc && npm run build:jsonschema",
+    "build:jsonschema": "node build-jsonschema.ts --output dist/schema.json",
+    "build:tsc": "tsc"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.1",
