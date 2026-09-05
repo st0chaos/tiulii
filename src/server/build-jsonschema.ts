@@ -1,5 +1,6 @@
-import { writeFile } from "node:fs/promises";
-import { configSchema } from "../src/server/config";
+import { configSchema } from "./config.ts";
+import { mkdir, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 import { parseArgs } from "node:util";
 
 const schema = configSchema.toJSONSchema({
@@ -16,5 +17,7 @@ const { values } = parseArgs({
 if (!values.output) {
   throw new Error("Missing required option: --output");
 }
+
+await mkdir(dirname(values.output), { recursive: true });
 
 await writeFile(values.output, JSON.stringify(schema), "utf-8");

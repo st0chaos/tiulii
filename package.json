@@ -6,9 +6,8 @@
     "src/*"
   ],
   "scripts": {
-    "build": "npm run build:shared && npm run build -w ./src/client && npm run build -w ./src/server",
-    "build:shared": "npm run build -w ./src/shared",
-    "bundle": "npm run build && node ./scripts/bundle.ts"
+    "build": "npm run build -w src/shared && npm run build -w src/client && npm run build -w src/server",
+    "bundle": "npm run build && node bundle.ts"
   },
   "devDependencies": {
     "rolldown": "^1.2.7",
