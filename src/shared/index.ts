@@ -74,7 +74,8 @@ export const LINE_BEGIN_ATTR = "src-line-begin";
 export const LINE_END_ATTR = "src-line-end";
 
 export interface InitalizationParams {
-  metadata: string[];
+  config: Config;
+  customCSS?: string | undefined;
 }
 
 interface ServerMessageRender {

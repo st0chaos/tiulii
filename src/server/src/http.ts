@@ -20,14 +20,9 @@ import constants from "node:constants";
 const app = new Hono();
 
 app.get(INIT_URL, (c) => {
-  const metadata: string[] = [];
-  if (cssFileContent) metadata.push(`<style>${cssFileContent}</style>`);
-  if (config.markdown.math)
-    metadata.push(
-      '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css" integrity="sha384-u1zONI5gPXUx0UKI62c75/zww972y0v2rSK5ZYlVdS6xEuWDeZWUI66v6t1gvlXJ" crossorigin="anonymous" />',
-    );
   const message: InitalizationParams = {
-    metadata: metadata,
+    config: config,
+    customCSS: cssFileContent,
   };
   return c.json(message);
 });
