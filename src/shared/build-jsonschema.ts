@@ -1,4 +1,4 @@
-import { configSchema } from "./config.ts";
+import { configSchema } from "./index.ts";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { parseArgs } from "node:util";

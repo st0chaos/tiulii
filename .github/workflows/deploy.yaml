@@ -6,7 +6,6 @@ on:
       - main
       - "ci/*"
     paths:
-      - src/server/**
       - src/shared/**
 
 permissions:
@@ -37,11 +36,11 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
       - name: Build dependencies
-        run: npm run build
+        run: npm run build -w src/shared
       - name: Generate documentation
         run: |
           mkdir public
-          generate-schema-doc src/server/dist/schema.json public/index.html
+          generate-schema-doc src/shared/dist/schema.json public/index.html
       - name: Setup pages
         uses: actions/configure-pages@v6
       - name: Upload artifact

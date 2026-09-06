@@ -1,11 +1,11 @@
 import {
+  INIT_URL,
   SSE_URL,
   LINE_BEGIN_ATTR,
   LINE_END_ATTR,
   type ServerMessage,
   type ServerMessageRegistry,
-  INIT_URL,
-  type InitalizationMessage,
+  type InitalizationParams,
 } from "@tiulii/shared";
 
 const app = document.createElement("div");
@@ -13,17 +13,14 @@ document.body.prepend(app);
 
 fetch(INIT_URL)
   .then((response) => response.json())
-  .then((message: InitalizationMessage) => {
-    document.head.insertAdjacentHTML("afterbegin", message.metadata.join(""));
+  .then((params: InitalizationParams) => {
+    document.head.insertAdjacentHTML("afterbegin", params.metadata.join(""));
+    return params;
   })
   .then(() => {
     const registry: ServerMessageRegistry = {
       render(message) {
         app.innerHTML = message.html;
-      },
-
-      log(message) {
-        console.log(message.message);
       },
 
       scroll(message) {
@@ -55,15 +52,14 @@ fetch(INIT_URL)
         }
       },
     };
-    const source = new EventSource(SSE_URL);
 
+    const source = new EventSource(SSE_URL);
     source.onerror = (event) => {
       console.error(event);
       source.close();
     };
-
     source.onmessage = (event) => {
-      const message: ServerMessage = JSON.parse(event.data);
+      const message = JSON.parse(event.data) as ServerMessage;
       const handler = registry[message.method];
       if (handler === undefined) {
         throw new Error(`No handler registered for method: ${message.method}`);
