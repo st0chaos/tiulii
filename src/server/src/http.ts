@@ -9,6 +9,7 @@ import { config, cssFileContent } from "./config.js";
 import { currentHTML$, currentLine$, getActiveURI } from "./state.js";
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
+import { compress } from "hono/compress";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { SSEStreamingApi, streamSSE } from "hono/streaming";
 import { fileURLToPath } from "node:url";
@@ -18,6 +19,8 @@ import { access } from "node:fs/promises";
 import constants from "node:constants";
 
 const app = new Hono();
+
+app.use(compress());
 
 app.get(INIT_URL, (c) => {
   const message: InitalizationParams = {
