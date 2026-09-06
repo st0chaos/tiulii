@@ -28,7 +28,7 @@ fetch(INIT_URL)
     }
     return params;
   })
-  .then(() => {
+  .then(({ config }) => {
     const registry: ServerMessageRegistry = {
       render(message) {
         app.innerHTML = message.html;
@@ -58,7 +58,7 @@ fetch(INIT_URL)
           const end = parseInt(elm.getAttribute(LINE_END_ATTR)!, 10);
           if (beg <= message.line) {
             target = elm;
-            if (end - beg < 30) ratio = 0;
+            if (end - beg < config.scroll.threshold) ratio = 0;
             else ratio = (message.line - beg) / (end - beg);
           } else {
             break;
@@ -69,7 +69,7 @@ fetch(INIT_URL)
           // T is target top relative to viewport + height by which viewport scrolled.
           // In other words, T is the top relative to the page.
           const T = rect.top + window.scrollY;
-          const H = window.innerHeight * 0.2; // Move viewport slightly up
+          const H = window.innerHeight * config.scroll.top; // Move viewport slightly up
           window.scrollTo({
             top: T - H + rect.height * ratio,
             behavior: "smooth",
