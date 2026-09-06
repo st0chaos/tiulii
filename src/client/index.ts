@@ -32,6 +32,20 @@ fetch(INIT_URL)
     const registry: ServerMessageRegistry = {
       render(message) {
         app.innerHTML = message.html;
+
+        document.querySelectorAll("img").forEach((img) => {
+          img.addEventListener("click", () => {
+            if (!document.fullscreenElement) {
+              img.requestFullscreen().catch((err) => {
+                console.error(
+                  `Error attempting to enable full-screen mode: ${err.message}`,
+                );
+              });
+            } else {
+              document.exitFullscreen();
+            }
+          });
+        });
       },
 
       scroll(message) {
