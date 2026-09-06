@@ -5,11 +5,9 @@
     "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
-    "rewriteRelativeImportExtensions": true,
 
     "module": "esnext",
     "moduleResolution": "bundler",
-    "lib": ["esnext"],
-    "types": ["node"]
+    "lib": ["esnext"]
   }
 }

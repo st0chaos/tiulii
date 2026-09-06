@@ -34,7 +34,7 @@ jobs:
       - name: Install json-schema-for-humans
         run: pip install json-schema-for-humans
       - name: Install Node.js dependencies
-        run: npm ci
+        run: npm ci -w src/shared
       - name: Build dependencies
         run: npm run build -w src/shared
       - name: Generate documentation

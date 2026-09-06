@@ -2,10 +2,15 @@
   "name": "@tiulii/web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc && rolldown -c"
   },
   "dependencies": {
     "@tiulii/shared": "*"
+  },
+  "devDependencies": {
+    "rolldown": "^1.2.7",
+    "typescript": "6.0.3"
   }
 }
