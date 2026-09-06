@@ -1,9 +1,9 @@
 {
-  "name": "@tiulii/server",
+  "name": "tiulii",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc && rolldown -c"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.1",
@@ -19,6 +19,8 @@
     "vscode-languageserver-textdocument": "^1.0.14"
   },
   "devDependencies": {
-    "@types/node": "^26.4.0"
+    "@types/node": "^26.4.0",
+    "rolldown": "^1.2.7",
+    "typescript": "6.0.3"
   }
 }
