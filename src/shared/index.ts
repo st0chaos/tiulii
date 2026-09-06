@@ -41,6 +41,25 @@ export const configSchema = z
       })
       .prefault({})
       .describe("Configuration options for Markdown extensions."),
+    scroll: z
+      .object({
+        threshold: z
+          .int()
+          .default(30)
+          .describe(
+            `Threshold for enabling proportional scrolling.
+If the number of lines exceeds this value,
+it will scroll to the proportional position of the current line within the total line height.`,
+          ),
+        top: z
+          .number()
+          .default(0.1)
+          .describe(
+            "Height between the top of viewport and the beginning of the block at cursor.",
+          ),
+      })
+      .prefault({})
+      .describe("Configuration options for synchronized scrolling."),
     shiki: z
       .object({
         theme: z
