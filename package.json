@@ -9,6 +9,9 @@
     "build": "npm run build -w src/shared && npm run build -w src/client && npm run build -w src/server",
     "bundle": "npm run build && node bundle.ts"
   },
+  "dependencies": {
+    "zod": "^4.5.4"
+  },
   "devDependencies": {
     "rolldown": "^1.2.7",
     "typescript": "6.0.3"
