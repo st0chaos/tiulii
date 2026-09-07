@@ -7,9 +7,24 @@ import {
   type ServerMessageRegistry,
   type InitalizationParams,
 } from "@tiulii/shared";
+import mermaid from "mermaid";
+
+mermaid.initialize({ startOnLoad: false });
 
 const app = document.createElement("div");
 document.body.prepend(app);
+
+async function mermaidRender(element: Element) {
+  const uuid = `mermaid-${crypto.randomUUID()}`;
+  const { svg } = await mermaid.render(uuid, element.textContent);
+  let lineAttrs = "";
+  let line: string | null;
+  if ((line = element.getAttribute(LINE_BEGIN_ATTR)) !== null)
+    lineAttrs += ` ${LINE_BEGIN_ATTR}="${line}"`;
+  if ((line = element.getAttribute(LINE_END_ATTR)) !== null)
+    lineAttrs += ` ${LINE_END_ATTR}="${line}"`;
+  element.outerHTML = `<div ${lineAttrs}>${svg}</div>`;
+}
 
 fetch(INIT_URL)
   .then((response) => response.json())
@@ -25,6 +40,9 @@ fetch(INIT_URL)
         "afterbegin",
         '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css" integrity="sha384-u1zONI5gPXUx0UKI62c75/zww972y0v2rSK5ZYlVdS6xEuWDeZWUI66v6t1gvlXJ" crossorigin="anonymous" />',
       );
+    }
+    if (params.config.mermaid.enable) {
+      mermaid.initialize(params.config.mermaid.options);
     }
     return params;
   })
@@ -46,6 +64,14 @@ fetch(INIT_URL)
             }
           });
         });
+
+        if (config.mermaid.enable) {
+          for (const element of document.querySelectorAll(
+            `.${config.mermaid.class}`,
+          )) {
+            mermaidRender(element);
+          }
+        }
       },
 
       scroll(message) {
