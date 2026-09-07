@@ -24,11 +24,11 @@ export const configSchema = z
           .describe("Whether to enable strikethrough text formatting."),
         math: z
           .boolean()
-          .default(false)
+          .default(true)
           .describe("Whether to enable math rendering."),
         highlight: z
           .boolean()
-          .default(false)
+          .default(true)
           .describe("Whether to enable text highlighting."),
         frontMatter: z
           .boolean()
@@ -36,7 +36,7 @@ export const configSchema = z
           .describe("Whether to parse front matter."),
         attribute: z
           .boolean()
-          .default(false)
+          .default(true)
           .describe("Whether to parse attributes in curly brackets."),
       })
       .prefault({})
@@ -88,7 +88,7 @@ it will scroll to the proportional position of the current line within the total
           .trim()
           .min(1)
           .optional()
-          .transform((value) => value ?? "mermaid")
+          .transform((value) => value ?? `${SERVER_NAME}-mermaid`)
           .describe("Class name for mermaid elements."),
         options: z
           .record(z.string(), z.any())
