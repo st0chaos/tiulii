@@ -7,6 +7,7 @@ on:
       - "ci/*"
     paths:
       - src/shared/**
+      - .github/workflows/deploy.yaml
 
 permissions:
   contents: read
@@ -36,7 +37,7 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci -w src/shared
       - name: Build dependencies
-        run: npm run build -w src/shared
+        run: npm run build:jsonschema -w src/shared
       - name: Generate documentation
         run: |
           mkdir public
