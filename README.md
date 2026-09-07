@@ -14,6 +14,7 @@
   - Synchronized scrolling.
   - Math support via [KaTeX](https://katex.org) with custom macro support.
   - Syntax highlighting powered by [Shiki](https://shiki.style).
+  - Mermaid support.
 
 ## Installation
 
@@ -24,11 +25,11 @@ Ensure you have [Node.js](https://nodejs.org) installed, then build from source:
 ```bash
 git clone https://github.com/st0chaos/tiulii.git --depth=1
 cd tiulii
-npm install
+npm ci # or npm install
 npm run build
 
 # Link to your system path (or run directly via node ./dist/tiulii --stdio)
-ln --symbolic "$(realpath ./dist/tiulii)" /path/to/your/bin/tiulii
+ln --symbolic "$(realpath ./src/server/dist/cli.js)" /path/to/your/bin/tiulii
 ```
 
 ## Usage
