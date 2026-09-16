@@ -45,7 +45,7 @@ export const configSchema = z
       .object({
         threshold: z
           .int()
-          .default(30)
+          .default(20)
           .describe(
             `Threshold for enabling proportional scrolling.
 If the number of lines exceeds this value,
