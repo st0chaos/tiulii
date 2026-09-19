@@ -6,5 +6,8 @@
   ],
   "scripts": {
     "build": "npm run build -w src/shared && npm run build -w src/client && npm run build -w src/server"
+  },
+  "bin": {
+    "tiulii": "./src/server/dist/cli.js"
   }
 }
