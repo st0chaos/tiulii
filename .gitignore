@@ -3,3 +3,4 @@ dist/
 *.log
 *.lua
 *.tsbuildinfo
+/result
