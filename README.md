@@ -18,6 +18,12 @@
 
 ## Installation
 
+### Install using Nix Flake
+
+```bash
+nix profile install github:st0chaos/tiulii
+```
+
 ### Build from source
 
 Ensure you have [Node.js](https://nodejs.org) installed, then build from source:
