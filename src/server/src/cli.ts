@@ -6,7 +6,7 @@ import {
   TextDocumentSyncKind,
   URI,
 } from "vscode-languageserver/node";
-import { change$, setActiveURI, close$, open$, currentLine$ } from "./state.js";
+import { change$, setActiveURI, close$, open$, cursor$, type DidMoveCursorParams } from "./state.js";
 import { httpServer } from "./http.js";
 import open from "open";
 import { SERVER_NAME } from "@tiulii/shared";
@@ -45,9 +45,9 @@ connection.onNotification(
 );
 
 connection.onNotification(
-  new NotificationType<{ line: number }>(`${SERVER_NAME}/didMoveCursor`),
-  ({ line }) => {
-    currentLine$.next(line);
+  new NotificationType<DidMoveCursorParams>(`${SERVER_NAME}/didMoveCursor`),
+  (params) => {
+    cursor$.next(params);
   },
 );
 

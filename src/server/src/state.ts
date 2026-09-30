@@ -19,6 +19,7 @@ import {
   EMPTY,
   switchMap,
   scan,
+  merge,
 } from "rxjs";
 import {
   type DidOpenTextDocumentParams,
@@ -29,9 +30,15 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import { getParser } from "./parser.js";
 import type { Parser } from "./shared.js";
 
+export interface DidMoveCursorParams {
+  line: number;
+  uri: string;
+}
+
 export const open$ = new Subject<DidOpenTextDocumentParams>();
 export const close$ = new Subject<DidCloseTextDocumentParams>();
 export const change$ = new Subject<DidChangeTextDocumentParams>();
+export const cursor$ = new Subject<DidMoveCursorParams>();
 
 function parseIntoStream(
   parser: Parser,
@@ -50,7 +57,19 @@ function parseIntoStream(
   );
 }
 
-const updates$ = open$.pipe(
+interface UpdateHTMLEvent {
+  kind: "html";
+  uri: string;
+  html: string | undefined;
+}
+interface UpdateLineEvent {
+  kind: "line";
+  uri: string;
+  line: number;
+}
+type UpdateEvent = UpdateHTMLEvent | UpdateLineEvent;
+
+const updates$: Observable<UpdateEvent> = open$.pipe(
   mergeMap((openParams) => {
     const { uri, languageId, text } = openParams.textDocument;
     let version = 0;
@@ -63,11 +82,11 @@ const updates$ = open$.pipe(
       filter((params) => params.textDocument.uri === uri),
     );
 
-    const initialUpdates$ = parseIntoStream(parser, text, uri).pipe(
-      map((html) => ({ uri: uri, html: html })),
+    const initialHtmlUpdates$: Observable<UpdateHTMLEvent> = parseIntoStream(parser, text, uri).pipe(
+      map((html) => ({ kind: "html", uri: uri, html: html })),
     );
 
-    const changeUpdates$ = change$
+    const followingHtmlUpdates$: Observable<UpdateHTMLEvent> = change$
       .pipe(
         filter((params) => params.textDocument.uri === uri),
         map((params) => params.contentChanges),
@@ -84,31 +103,59 @@ const updates$ = open$.pipe(
           return textDocument.getText();
         }),
         switchMap((txt) => parseIntoStream(parser, txt, uri)),
-        map((html) => ({ uri: uri, html: html })),
+        map((html) => ({ kind: "html", uri: uri, html: html } as UpdateHTMLEvent)),
         takeUntil(closeThis$),
       )
-      .pipe(endWith({ uri: uri, html: undefined }));
+      .pipe(endWith({ kind: "html", uri: uri, html: undefined } as UpdateHTMLEvent));
 
-    return concat(initialUpdates$, changeUpdates$);
+    const htmlUpdates$: Observable<UpdateHTMLEvent> = concat(initialHtmlUpdates$, followingHtmlUpdates$);
+
+    const lineUpdates$: Observable<UpdateLineEvent> = cursor$.pipe(
+      filter((params) => params.uri === uri),
+      map((params) => ({ kind: "line", uri, line: params.line } as UpdateLineEvent)),
+      takeUntil(closeThis$),
+    );
+
+    return merge(htmlUpdates$, lineUpdates$);
   }),
 );
 
-const docs$ = new BehaviorSubject<Record<string, string>>({});
+interface DocumentData {
+  html: string;
+  line: number;
+}
+const docs$ = new BehaviorSubject<Record<string, DocumentData>>({});
 const uri$ = new BehaviorSubject<string | undefined>(undefined);
 
-updates$.subscribe(({ uri, html }) => {
-  if (html === undefined) {
-    const { [uri]: _, ...rest } = docs$.value;
-    docs$.next({ ...rest });
-    if (uri$.value === uri) {
-      uri$.next(undefined);
+updates$.subscribe((event) => {
+  switch (event.kind) {
+    case "html": {
+      const { uri, html } = event;
+      if (html === undefined) {
+        const { [uri]: _, ...rest } = docs$.value;
+        docs$.next({ ...rest });
+        if (uri$.value === uri) {
+          uri$.next(undefined);
+        }
+        return;
+      }
+      const origin = docs$.value[uri]
+      if (origin) {
+        docs$.next({ ...docs$.value, [uri]: { ...origin, html }});
+      } else {
+        docs$.next({ ...docs$.value, [uri]: { html, line: 0 } });
+      }
+      if (uri$.value === undefined) uri$.next(uri);
+      break;
     }
-    return;
-  }
-
-  docs$.next({ ...docs$.value, [uri]: html });
-  if (uri$.value === undefined) {
-    uri$.next(uri);
+    case "line": {
+      const { uri, line } = event;
+      const origin = docs$.value[uri];
+      if (origin) {
+        docs$.next({ ...docs$.value, [uri]: { ...origin, line } });
+      }
+      break;
+    }
   }
 });
 
@@ -122,11 +169,19 @@ export function getActiveURI() {
   return uri$.value;
 }
 
-export const currentLine$ = new BehaviorSubject<number | undefined>(undefined);
-
-export const currentHTML$ = combineLatest([docs$, uri$]).pipe(
+const latestDocument$ = combineLatest([docs$, uri$]).pipe(
   debounceTime(100),
   map(([docs, uri]) => (uri ? docs[uri] : undefined)),
+);
+
+export const currentLine$ = latestDocument$.pipe(
+  map(doc => doc?.line),
+  distinctUntilChanged(),
+  shareReplay(1),
+);
+
+export const currentHTML$ = latestDocument$.pipe(
+  map(doc => doc?.html),
   distinctUntilChanged(),
   shareReplay(1),
 );
