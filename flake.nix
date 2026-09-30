@@ -15,6 +15,12 @@
           src = ./.;
           npmDepsHash = "sha256-6XQ6GpFogOj4fKDfZnCE7HxlAczpRD/BAHedp/msTss=";
         };
+        devShells.default = pkgs.mkShell {
+          packages = [
+            pkgs.nodejs
+            pkgs.typescript-language-server
+          ];
+        };
       });
 }
 
