@@ -13,7 +13,7 @@
           pname = "tiulii";
           version = "0.1.0";
           src = ./.;
-          npmDepsHash = "sha256-0uN118/pfPU+Hx5K2D7dujqNjzM5ux11U9kOtordsGc=";
+          npmDepsHash = "sha256-6XQ6GpFogOj4fKDfZnCE7HxlAczpRD/BAHedp/msTss=";
         };
       });
 }
