@@ -93,6 +93,65 @@ Then, enable the server in your init file:
 vim.lsp.enable('tiulii')
 ```
 
+### Emacs (Eglot)
+
+Add the following code to your `user-lisp-directory` or your init file.
+
+```elisp
+(defvar-local tiulii--flag nil)
+(defvar tiulii--buffer-count 0)
+(defvar tiulii--timer nil)
+(defvar tiulii-preview-key "C-c p")
+(defvar tiulii-idle-time 0.5)
+
+(defun tiulii--managed-p ()
+  (member "tiulii" (process-command (jsonrpc--process (eglot-current-server)))))
+
+(defun tiulii--on-window-buffer-change (_frame)
+  (let ((buffer (current-buffer))
+        (file-name (buffer-file-name)))
+    (when (and buffer file-name tiulii--flag)
+      (jsonrpc-notify (eglot-current-server) :tiulii/didChangeView
+                      `(:uri ,(eglot-path-to-uri file-name))))))
+
+(defun tiulii--on-idle-timeout ()
+  (let ((buffer (current-buffer))
+        (file-name (buffer-file-name)))
+    (when (and buffer file-name tiulii--flag)
+      (jsonrpc-notify (eglot-current-server) :tiulii/didMoveCursor
+                      (list :line (1- (line-number-at-pos nil t))
+                            :uri (eglot-path-to-uri file-name))))))
+
+(defun tiulii--preview ()
+  (interactive)
+  (jsonrpc-notify (eglot-current-server) :tiulii/openPreviewURL nil))
+
+(with-eval-after-load 'eglot
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              (if (eglot-managed-p)
+                  (when (tiulii--managed-p)
+                    (setq-local tiulii--flag t)
+                    (cl-incf tiulii--buffer-count)
+                    (keymap-local-set tiulii-preview-key #'tiulii--preview)
+                    (when (= 1 tiulii--buffer-count)
+                      (add-hook 'window-buffer-change-functions
+                                #'tiulii--on-window-buffer-change)
+                      (setq tiulii--timer
+                            (run-with-idle-timer
+                             tiulii-idle-time t #'tiulii--on-idle-timeout))))
+                (setq-local tiulii--flag nil)
+                (cl-decf tiulii--buffer-count)
+                (keymap-local-unset tiulii-preview-key)
+                (when (= 0 tiulii--buffer-count)
+                  (remove-hook 'window-buffer-change-functions
+                               #'tiulii--on-window-buffer-change)
+                  (setq tiulii--timer nil))))))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs '(markdown-mode . ("tiulii" "--stdio"))))
+```
+
 ## Configuration
 
 Tiulii looks for a JavaScript configuration file with a default export at
