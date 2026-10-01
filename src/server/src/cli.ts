@@ -66,3 +66,7 @@ connection.onNotification(
 );
 
 connection.listen();
+
+// Local Variables:
+// mode: typescript-ts
+// End:
