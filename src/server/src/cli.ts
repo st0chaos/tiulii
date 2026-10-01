@@ -57,7 +57,11 @@ connection.onNotification(
     const address = httpServer.address();
     if (address === null) return;
     if (typeof address === "string") return;
-    await open(`http://127.0.0.1:${address.port}`);
+    try {
+      await open(`http://127.0.0.1:${address.port}`);
+    } catch (err) {
+      console.error(err);
+    }
   },
 );
 
