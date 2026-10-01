@@ -154,7 +154,6 @@ export default function (md: MarkdownIt, userOptions?: KatexOptions) {
     try {
       return katex.renderToString(latex, options);
     } catch (error) {
-      if (options?.throwOnError) console.log(error);
       return `<span title="${escapeHtml(latex)}">${escapeHtml(error + "")}</span>`;
     }
   };
@@ -164,7 +163,6 @@ export default function (md: MarkdownIt, userOptions?: KatexOptions) {
     try {
       return `<span>${katex.renderToString(content, { displayMode: true, ...options })}</span>`;
     } catch (error) {
-      if (options?.throwOnError) console.log(error);
       return `<span title="${escapeHtml(content)}">${escapeHtml(error + "")}</span>`;
     }
   };
