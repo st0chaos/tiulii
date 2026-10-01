@@ -103,3 +103,6 @@ export const httpServer = serve({
   fetch: app.fetch,
   port: config.port,
 });
+
+const addr = httpServer.address();
+console.log(`Serving HTTP on ${(addr === null || typeof addr === "string") ? addr : `http://127.0.0.1:${addr.port}`}...`);
