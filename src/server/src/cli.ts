@@ -51,21 +51,26 @@ connection.onNotification(
   },
 );
 
+const address = httpServer.address();
+
 connection.onNotification(
   new NotificationType<{}>(`${SERVER_NAME}/openPreviewURL`),
   async (_) => {
-    const address = httpServer.address();
     if (address === null) return;
     if (typeof address === "string") return;
     try {
       await open(`http://127.0.0.1:${address.port}`);
     } catch (err) {
-      console.error(err);
+      connection.console.error(`${err}`);
     }
   },
 );
 
 connection.listen();
+
+connection.console.log(
+  `Serving HTTP on ${(address === null || typeof address === "string") ? address : `http://127.0.0.1:${address.port}`}...`
+);
 
 // Local Variables:
 // mode: typescript-ts
