@@ -104,9 +104,8 @@ function mathInlineGithub(state: StateInline, silent: boolean): boolean {
 
   if (silent) return true;
   const token = state.push(inlineMathTokenType, "math", 0);
-  token.markup = "$$";
+  token.markup = "$`";
   token.content = state.src.slice(beg + 2, end);
-  token.block = true;
   state.pos = end + 2;
   return true;
 }
