@@ -1,6 +1,6 @@
 # tiulii
 
-> > An LSP server that bridges your editor and browser for real-time file previewing.
+> An LSP server that bridges your editor and browser for real-time file previewing.
 
 ![Screenshot showing tiulii works with neovim and firefox](assets/screenshot.png)
 
@@ -77,6 +77,7 @@ return {
   end,
 
   on_attach = function(client, bufnr)
+    -- Use your preferred key here.
     vim.keymap.set(
       'n',
       '<LocalLeader><LocalLeader>',
@@ -100,11 +101,13 @@ vim.lsp.enable('tiulii')
 Add the following code to your `user-lisp-directory` or your init file.
 
 ```elisp
+(defvar tiulii-preview-key "C-c p"
+  "Key to start a preview page.")
+(defvar tiulii-idle-time 0.5
+  "Time interval of sending the line number where the cursor is located.")
 (defvar-local tiulii--flag nil)
 (defvar tiulii--buffer-count 0)
 (defvar tiulii--timer nil)
-(defvar tiulii-preview-key "C-c p")
-(defvar tiulii-idle-time 0.5)
 
 (defun tiulii--managed-p ()
   (member "tiulii" (process-command (jsonrpc--process (eglot-current-server)))))
