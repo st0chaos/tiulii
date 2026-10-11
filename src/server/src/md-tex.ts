@@ -1,10 +1,10 @@
 /* Copy and modify from microsoft/vscode-markdown-it-katex */
-import katex, { type KatexOptions } from "katex";
-import type { MarkdownIt, StateInline, Token } from "markdown-it";
+import katex, { type KatexOptions } from 'katex';
+import type { MarkdownIt, StateInline, Token } from 'markdown-it';
 
-const inlineMathTokenType = "inline_math";
+const inlineMathTokenType = 'inline_math';
 
-const displayMathTokenType = "display_math";
+const displayMathTokenType = 'display_math';
 
 // function isWhitespace(char: string): boolean {
 //   return /^\s$/u.test(char);
@@ -16,16 +16,16 @@ const displayMathTokenType = "display_math";
 
 function escapeHtml(unsafe: string): string {
   return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function mathInlineTeX(state: StateInline, silent: boolean): boolean {
   const beg = state.pos;
-  if (state.src[beg] !== "$") return false;
+  if (state.src[beg] !== '$') return false;
 
   // const lastToken = state.tokens.at(-1);
   // if (lastToken?.type === "html_inline") {
@@ -36,9 +36,9 @@ function mathInlineTeX(state: StateInline, silent: boolean): boolean {
   // }
 
   let end = beg;
-  while ((end = state.src.indexOf("$", end + 1)) !== -1) {
+  while ((end = state.src.indexOf('$', end + 1)) !== -1) {
     let backslash = 0;
-    for (let pos = end - 1; pos > beg && state.src[pos] === "\\"; pos--) {
+    for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
       backslash++;
     }
     if (backslash % 2 === 0) {
@@ -50,8 +50,8 @@ function mathInlineTeX(state: StateInline, silent: boolean): boolean {
   if (end - beg === 1) return false;
 
   if (silent) return true;
-  const token = state.push(inlineMathTokenType, "math", 0);
-  token.markup = "$";
+  const token = state.push(inlineMathTokenType, 'math', 0);
+  token.markup = '$';
   token.content = state.src.slice(beg + 1, end);
   state.pos = end + 1;
   return true;
@@ -59,12 +59,12 @@ function mathInlineTeX(state: StateInline, silent: boolean): boolean {
 
 function mathDisplayTeX(state: StateInline, silent: boolean): boolean {
   const beg = state.pos;
-  if (state.src.slice(beg, beg + 2) !== "$$") return false;
+  if (state.src.slice(beg, beg + 2) !== '$$') return false;
 
   let end = beg;
-  while ((end = state.src.indexOf("$$", end + 2)) !== -1) {
+  while ((end = state.src.indexOf('$$', end + 2)) !== -1) {
     let backslash = 0;
-    for (let pos = end - 1; pos > beg && state.src[pos] === "\\"; pos--) {
+    for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
       backslash++;
     }
     if (backslash % 2 === 0) {
@@ -76,8 +76,8 @@ function mathDisplayTeX(state: StateInline, silent: boolean): boolean {
   if (end - beg === 2) return false;
 
   if (silent) return true;
-  const token = state.push(displayMathTokenType, "math", 0);
-  token.markup = "$$";
+  const token = state.push(displayMathTokenType, 'math', 0);
+  token.markup = '$$';
   token.content = state.src.slice(beg + 2, end);
   token.block = true;
   state.pos = end + 2;
@@ -86,12 +86,12 @@ function mathDisplayTeX(state: StateInline, silent: boolean): boolean {
 
 function mathInlineGithub(state: StateInline, silent: boolean): boolean {
   const beg = state.pos;
-  if (state.src.slice(beg, beg + 2) !== "$`") return false;
+  if (state.src.slice(beg, beg + 2) !== '$`') return false;
 
   let end = beg;
-  while ((end = state.src.indexOf("`$", end + 2)) !== -1) {
+  while ((end = state.src.indexOf('`$', end + 2)) !== -1) {
     let backslash = 0;
-    for (let pos = end - 1; pos > beg && state.src[pos] === "\\"; pos--) {
+    for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
       backslash++;
     }
     if (backslash % 2 === 0) {
@@ -103,8 +103,8 @@ function mathInlineGithub(state: StateInline, silent: boolean): boolean {
   if (end - beg === 2) return false;
 
   if (silent) return true;
-  const token = state.push(inlineMathTokenType, "math", 0);
-  token.markup = "$`";
+  const token = state.push(inlineMathTokenType, 'math', 0);
+  token.markup = '$`';
   token.content = state.src.slice(beg + 2, end);
   state.pos = end + 2;
   return true;
@@ -112,12 +112,12 @@ function mathInlineGithub(state: StateInline, silent: boolean): boolean {
 
 function mathDisplayLaTeX(state: StateInline, silent: boolean): boolean {
   const beg = state.pos;
-  if (state.src.slice(beg, beg + 2) !== "\\[") return false;
+  if (state.src.slice(beg, beg + 2) !== '\\[') return false;
 
   let end = beg;
-  while ((end = state.src.indexOf("\\]", end + 2)) !== -1) {
+  while ((end = state.src.indexOf('\\]', end + 2)) !== -1) {
     let backslash = 0;
-    for (let pos = end - 1; pos > beg && state.src[pos] === "\\"; pos--) {
+    for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
       backslash++;
     }
     if (backslash % 2 === 0) {
@@ -127,8 +127,8 @@ function mathDisplayLaTeX(state: StateInline, silent: boolean): boolean {
   if (end === -1) return false;
 
   if (silent) return true;
-  const token = state.push(displayMathTokenType, "math", 0);
-  token.markup = "\\[";
+  const token = state.push(displayMathTokenType, 'math', 0);
+  token.markup = '\\[';
   token.content = state.src.slice(beg + 2, end);
   token.block = true;
   state.pos = end + 2;
@@ -137,12 +137,12 @@ function mathDisplayLaTeX(state: StateInline, silent: boolean): boolean {
 
 function mathInlineLaTeX(state: StateInline, silent: boolean): boolean {
   const beg = state.pos;
-  if (state.src.slice(beg, beg + 2) !== "\\(") return false;
+  if (state.src.slice(beg, beg + 2) !== '\\(') return false;
 
   let end = beg;
-  while ((end = state.src.indexOf("\\)", end + 2)) !== -1) {
+  while ((end = state.src.indexOf('\\)', end + 2)) !== -1) {
     let backslash = 0;
-    for (let pos = end - 1; pos > beg && state.src[pos] === "\\"; pos--) {
+    for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
       backslash++;
     }
     if (backslash % 2 === 0) {
@@ -152,19 +152,19 @@ function mathInlineLaTeX(state: StateInline, silent: boolean): boolean {
   if (end === -1) return false;
 
   if (silent) return true;
-  const token = state.push(inlineMathTokenType, "math", 0);
-  token.markup = "\\(";
+  const token = state.push(inlineMathTokenType, 'math', 0);
+  token.markup = '\\(';
   token.content = state.src.slice(beg + 2, end);
   state.pos = end + 2;
   return true;
 }
 
 export default function (md: MarkdownIt, userOptions?: KatexOptions) {
-  md.inline.ruler.after("escape", "math_inline_github", mathInlineGithub);
-  md.inline.ruler.after("math_inline_github", "math_inline_tex", mathInlineTeX);
-  md.inline.ruler.after("escape", "math_display_tex", mathDisplayTeX);
-  md.inline.ruler.before("escape", "math_display_latex", mathDisplayLaTeX);
-  md.inline.ruler.before("escape", "math_inline_latex", mathInlineLaTeX);
+  md.inline.ruler.after('escape', 'math_inline_github', mathInlineGithub);
+  md.inline.ruler.after('math_inline_github', 'math_inline_tex', mathInlineTeX);
+  md.inline.ruler.after('escape', 'math_display_tex', mathDisplayTeX);
+  md.inline.ruler.before('escape', 'math_display_latex', mathDisplayLaTeX);
+  md.inline.ruler.before('escape', 'math_inline_latex', mathInlineLaTeX);
 
   // Ensure `macros` property exists so that users can define their own macros
   const options: KatexOptions = {
@@ -178,7 +178,7 @@ export default function (md: MarkdownIt, userOptions?: KatexOptions) {
     try {
       return katex.renderToString(latex, options);
     } catch (error) {
-      return `<span title="${escapeHtml(latex)}">${escapeHtml(error + "")}</span>`;
+      return `<span title="${escapeHtml(latex)}">${escapeHtml(error + '')}</span>`;
     }
   };
 
@@ -187,7 +187,7 @@ export default function (md: MarkdownIt, userOptions?: KatexOptions) {
     try {
       return `<span>${katex.renderToString(content, { displayMode: true, ...options })}</span>`;
     } catch (error) {
-      return `<span title="${escapeHtml(content)}">${escapeHtml(error + "")}</span>`;
+      return `<span title="${escapeHtml(content)}">${escapeHtml(error + '')}</span>`;
     }
   };
 

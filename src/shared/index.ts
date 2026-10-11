@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const configSchema = z
   .object({
@@ -7,40 +7,40 @@ export const configSchema = z
       .min(0)
       .max(65535)
       .default(0)
-      .describe("Port on which the HTTP server listens."),
+      .describe('Port on which the HTTP server listens.'),
     cssFile: z
       .string()
       .optional()
-      .describe("Path to the custom CSS file relative to the user directory."),
+      .describe('Path to the custom CSS file relative to the user directory.'),
     markdown: z
       .object({
         table: z
           .boolean()
           .default(true)
-          .describe("Whether to enable table support."),
+          .describe('Whether to enable table support.'),
         strikethrough: z
           .boolean()
           .default(false)
-          .describe("Whether to enable strikethrough text formatting."),
+          .describe('Whether to enable strikethrough text formatting.'),
         math: z
           .boolean()
           .default(true)
-          .describe("Whether to enable math rendering."),
+          .describe('Whether to enable math rendering.'),
         highlight: z
           .boolean()
           .default(true)
-          .describe("Whether to enable text highlighting."),
+          .describe('Whether to enable text highlighting.'),
         frontMatter: z
           .boolean()
           .default(true)
-          .describe("Whether to parse front matter."),
+          .describe('Whether to parse front matter.'),
         attribute: z
           .boolean()
           .default(true)
-          .describe("Whether to parse attributes in curly brackets."),
+          .describe('Whether to parse attributes in curly brackets.'),
       })
       .prefault({})
-      .describe("Configuration options for Markdown extensions."),
+      .describe('Configuration options for Markdown extensions.'),
     scroll: z
       .object({
         threshold: z
@@ -49,70 +49,70 @@ export const configSchema = z
           .describe(
             `Threshold for enabling proportional scrolling.
 If the number of lines exceeds this value,
-it will scroll to the proportional position of the current line within the total line height.`,
+it will scroll to the proportional position of the current line within the total line height.`
           ),
         top: z
           .number()
           .default(0.1)
           .describe(
-            "Height between the top of viewport and the beginning of the block at cursor.",
+            'Height between the top of viewport and the beginning of the block at cursor.'
           ),
       })
       .prefault({})
-      .describe("Configuration options for synchronized scrolling."),
+      .describe('Configuration options for synchronized scrolling.'),
     shiki: z
       .object({
         theme: z
           .string()
-          .default("min-light")
+          .default('min-light')
           .describe(
-            "Theme for highlighting. See <https://shiki.style/themes>.",
+            'Theme for highlighting. See <https://shiki.style/themes>.'
           ),
       })
       .prefault({})
-      .describe("Configuration options for Shiki."),
+      .describe('Configuration options for Shiki.'),
     katex: z
       .record(z.string(), z.any())
       .default({})
       .describe(
-        "KaTeX configuration options. See <https://katex.org/docs/options>.",
+        'KaTeX configuration options. See <https://katex.org/docs/options>.'
       ),
     mermaid: z
       .object({
         enable: z
           .boolean()
           .default(true)
-          .describe("Whether to enable mermaid rendering."),
+          .describe('Whether to enable mermaid rendering.'),
         class: z
           .string()
           .trim()
           .min(1)
           .optional()
           .transform((value) => value ?? `${SERVER_NAME}-mermaid`)
-          .describe("Class name for mermaid elements."),
+          .describe('Class name for mermaid elements.'),
         options: z
           .record(z.string(), z.any())
           .default({})
           .describe(
-            "Additional Mermaid configuration options. See <https://mermaid.ai/open-source/config/schema-docs/config.html>",
+            'Additional Mermaid configuration options. See <https://mermaid.ai/open-source/config/schema-docs/config.html>'
           ),
       })
       .prefault({})
-      .describe("Mermaid configuration options."),
+      .describe('Mermaid configuration options.'),
   })
-  .describe("Configuration options for tiulii.");
+  .describe('Configuration options for tiulii.');
 
 export type Config = z.infer<typeof configSchema>;
 
-export const INIT_URL = "/api/init";
+export const INIT_URL = '/api/init';
 
-export const SSE_URL = "/api/sse";
+export const SSE_URL = '/api/sse';
 
-export const SERVER_NAME = "tiulii";
+export const SERVER_NAME = 'tiulii';
 
-export const LINE_BEGIN_ATTR = "src-line-begin";
+export const LINE_BEGIN_ATTR = 'src-line-begin';
 
-export const LINE_END_ATTR = "src-line-end";
+export const LINE_END_ATTR = 'src-line-end';
 
 export interface InitalizationParams {
   config: Config;
@@ -120,22 +120,22 @@ export interface InitalizationParams {
 }
 
 interface ServerMessageRender {
-  method: "render";
+  method: 'render';
   html: string;
 }
 
 interface ServerMessageScroll {
-  method: "scroll";
+  method: 'scroll';
   line: number;
 }
 
 export type ServerMessage = ServerMessageRender | ServerMessageScroll;
 
-export type ServerMessageByMethod<M extends ServerMessage["method"]> = Extract<
+export type ServerMessageByMethod<M extends ServerMessage['method']> = Extract<
   ServerMessage,
   { method: M }
 >;
 
 export type ServerMessageRegistry = {
-  [M in ServerMessage["method"]]: (message: ServerMessageByMethod<M>) => void;
+  [M in ServerMessage['method']]: (message: ServerMessageByMethod<M>) => void;
 };

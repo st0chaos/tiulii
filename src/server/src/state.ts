@@ -20,15 +20,15 @@ import {
   switchMap,
   scan,
   merge,
-} from "rxjs";
+} from 'rxjs';
 import {
   type DidOpenTextDocumentParams,
   type DidChangeTextDocumentParams,
   type DidCloseTextDocumentParams,
-} from "vscode-languageserver/node";
-import { TextDocument } from "vscode-languageserver-textdocument";
-import { getParser } from "./parser.js";
-import type { Parser } from "./shared.js";
+} from 'vscode-languageserver/node';
+import { TextDocument } from 'vscode-languageserver-textdocument';
+import { getParser } from './parser.js';
+import type { Parser } from './shared.js';
 
 export interface DidMoveCursorParams {
   line: number;
@@ -43,7 +43,7 @@ export const cursor$ = new Subject<DidMoveCursorParams>();
 function parseIntoStream(
   parser: Parser,
   content: string,
-  uri: string,
+  uri: string
 ): Observable<string> {
   const { html: initialHtml, replacements } = parser.parse(content, uri);
   return from(replacements).pipe(
@@ -51,19 +51,19 @@ function parseIntoStream(
     scan(
       (currentHtml, { placeholder, content }) =>
         currentHtml.replaceAll(placeholder, content),
-      initialHtml,
+      initialHtml
     ),
-    startWith(initialHtml),
+    startWith(initialHtml)
   );
 }
 
 interface UpdateHTMLEvent {
-  kind: "html";
+  kind: 'html';
   uri: string;
   html: string | undefined;
 }
 interface UpdateLineEvent {
-  kind: "line";
+  kind: 'line';
   uri: string;
   line: number;
 }
@@ -79,12 +79,14 @@ const updates$: Observable<UpdateEvent> = open$.pipe(
     if (!parser) return EMPTY;
 
     const closeThis$ = close$.pipe(
-      filter((params) => params.textDocument.uri === uri),
+      filter((params) => params.textDocument.uri === uri)
     );
 
-    const initialHtmlUpdates$: Observable<UpdateHTMLEvent> = parseIntoStream(parser, text, uri).pipe(
-      map((html) => ({ kind: "html", uri: uri, html: html })),
-    );
+    const initialHtmlUpdates$: Observable<UpdateHTMLEvent> = parseIntoStream(
+      parser,
+      text,
+      uri
+    ).pipe(map((html) => ({ kind: 'html', uri: uri, html: html })));
 
     const followingHtmlUpdates$: Observable<UpdateHTMLEvent> = change$
       .pipe(
@@ -103,21 +105,31 @@ const updates$: Observable<UpdateEvent> = open$.pipe(
           return textDocument.getText();
         }),
         switchMap((txt) => parseIntoStream(parser, txt, uri)),
-        map((html) => ({ kind: "html", uri: uri, html: html } as UpdateHTMLEvent)),
-        takeUntil(closeThis$),
+        map(
+          (html) => ({ kind: 'html', uri: uri, html: html }) as UpdateHTMLEvent
+        ),
+        takeUntil(closeThis$)
       )
-      .pipe(endWith({ kind: "html", uri: uri, html: undefined } as UpdateHTMLEvent));
+      .pipe(
+        endWith({ kind: 'html', uri: uri, html: undefined } as UpdateHTMLEvent)
+      );
 
-    const htmlUpdates$: Observable<UpdateHTMLEvent> = concat(initialHtmlUpdates$, followingHtmlUpdates$);
+    const htmlUpdates$: Observable<UpdateHTMLEvent> = concat(
+      initialHtmlUpdates$,
+      followingHtmlUpdates$
+    );
 
     const lineUpdates$: Observable<UpdateLineEvent> = cursor$.pipe(
       filter((params) => params.uri === uri),
-      map((params) => ({ kind: "line", uri, line: params.line } as UpdateLineEvent)),
-      takeUntil(closeThis$),
+      map(
+        (params) =>
+          ({ kind: 'line', uri, line: params.line }) as UpdateLineEvent
+      ),
+      takeUntil(closeThis$)
     );
 
     return merge(htmlUpdates$, lineUpdates$);
-  }),
+  })
 );
 
 interface DocumentData {
@@ -129,7 +141,7 @@ const uri$ = new BehaviorSubject<string | undefined>(undefined);
 
 updates$.subscribe((event) => {
   switch (event.kind) {
-    case "html": {
+    case 'html': {
       const { uri, html } = event;
       if (html === undefined) {
         const { [uri]: _, ...rest } = docs$.value;
@@ -139,16 +151,16 @@ updates$.subscribe((event) => {
         }
         return;
       }
-      const origin = docs$.value[uri]
+      const origin = docs$.value[uri];
       if (origin) {
-        docs$.next({ ...docs$.value, [uri]: { ...origin, html }});
+        docs$.next({ ...docs$.value, [uri]: { ...origin, html } });
       } else {
         docs$.next({ ...docs$.value, [uri]: { html, line: 0 } });
       }
       if (uri$.value === undefined) uri$.next(uri);
       break;
     }
-    case "line": {
+    case 'line': {
       const { uri, line } = event;
       const origin = docs$.value[uri];
       if (origin) {
@@ -171,17 +183,17 @@ export function getActiveURI() {
 
 const latestDocument$ = combineLatest([docs$, uri$]).pipe(
   debounceTime(100),
-  map(([docs, uri]) => (uri ? docs[uri] : undefined)),
+  map(([docs, uri]) => (uri ? docs[uri] : undefined))
 );
 
 export const currentLine$ = latestDocument$.pipe(
-  map(doc => doc?.line),
+  map((doc) => doc?.line),
   distinctUntilChanged(),
-  shareReplay(1),
+  shareReplay(1)
 );
 
 export const currentHTML$ = latestDocument$.pipe(
-  map(doc => doc?.html),
+  map((doc) => doc?.html),
   distinctUntilChanged(),
-  shareReplay(1),
+  shareReplay(1)
 );

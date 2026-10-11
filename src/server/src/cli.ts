@@ -5,11 +5,18 @@ import {
   ProposedFeatures,
   TextDocumentSyncKind,
   URI,
-} from "vscode-languageserver/node";
-import { change$, setActiveURI, close$, open$, cursor$, type DidMoveCursorParams } from "./state.js";
-import { httpServer } from "./http.js";
-import open from "open";
-import { SERVER_NAME } from "@tiulii/shared";
+} from 'vscode-languageserver/node';
+import {
+  change$,
+  setActiveURI,
+  close$,
+  open$,
+  cursor$,
+  type DidMoveCursorParams,
+} from './state.js';
+import { httpServer } from './http.js';
+import open from 'open';
+import { SERVER_NAME } from '@tiulii/shared';
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -41,14 +48,14 @@ connection.onNotification(
   new NotificationType<{ uri: URI }>(`${SERVER_NAME}/didChangeView`),
   ({ uri }) => {
     setActiveURI(uri);
-  },
+  }
 );
 
 connection.onNotification(
   new NotificationType<DidMoveCursorParams>(`${SERVER_NAME}/didMoveCursor`),
   (params) => {
     cursor$.next(params);
-  },
+  }
 );
 
 const address = httpServer.address();
@@ -57,19 +64,19 @@ connection.onNotification(
   new NotificationType<{}>(`${SERVER_NAME}/openPreviewURL`),
   async (_) => {
     if (address === null) return;
-    if (typeof address === "string") return;
+    if (typeof address === 'string') return;
     try {
       await open(`http://127.0.0.1:${address.port}`);
     } catch (err) {
       connection.console.error(`${err}`);
     }
-  },
+  }
 );
 
 connection.listen();
 
 connection.console.log(
-  `Serving HTTP on ${(address === null || typeof address === "string") ? address : `http://127.0.0.1:${address.port}`}...`
+  `Serving HTTP on ${address === null || typeof address === 'string' ? address : `http://127.0.0.1:${address.port}`}...`
 );
 
 // Local Variables:

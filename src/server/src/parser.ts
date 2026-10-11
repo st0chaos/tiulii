@@ -1,5 +1,5 @@
-import type { Parser } from "./shared.js";
-import * as Markdown from "./md.js";
+import type { Parser } from './shared.js';
+import * as Markdown from './md.js';
 
 const parserRegistry: Partial<Record<string, Parser>> = {
   markdown: Markdown.parser,

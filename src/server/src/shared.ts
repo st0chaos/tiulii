@@ -1,6 +1,6 @@
 // import type { TextDocumentContentChangeEvent } from "vscode-languageserver";
 
-import type { Env } from "markdown-it";
+import type { Env } from 'markdown-it';
 
 export interface Replacement {
   placeholder: string;
@@ -22,7 +22,7 @@ export interface MarkdownParsingEnv extends Env {
 }
 export namespace MarkdownParsingEnv {
   export function is(env: Env): env is MarkdownParsingEnv {
-    return "replacements" in env;
+    return 'replacements' in env;
   }
 }
 

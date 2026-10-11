@@ -1,13 +1,13 @@
-import { defineConfig } from "rolldown";
+import { defineConfig } from 'rolldown';
 
 export default defineConfig({
-  input: "index.ts",
+  input: 'index.ts',
   output: {
-    format: "iife",
+    format: 'iife',
     minify: true,
-    dir: "../server/dist",
+    dir: '../server/dist',
   },
   transform: {
-    target: "es2015",
+    target: 'es2015',
   },
 });
