@@ -49,6 +49,7 @@ fetch(INIT_URL)
   .then(({ config }) => {
     const registry: ServerMessageRegistry = {
       render(message) {
+        app.style.minHeight = `${app.offsetHeight}px`;
         app.innerHTML = message.html;
 
         document.querySelectorAll('img').forEach((img) => {
