@@ -26,6 +26,14 @@ export namespace MarkdownParsingEnv {
   }
 }
 
+export async function waitParseResult(result: ParseResult) {
+  const rep = await Promise.all(result.replacements);
+  return rep.reduce(
+    (acc, curr) => acc.replaceAll(curr.placeholder, curr.content),
+    result.html
+  );
+}
+
 // export interface IncrementalParser extends Parser {
 //   update(
 //     uri: string,
