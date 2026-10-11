@@ -11,7 +11,7 @@ export default (md: MarkdownIt) => {
   md.renderer.rules['fence'] = (tokens, idx, options, env, renderer) => {
     const token = tokens[idx]!;
     const code = token.content.trim();
-    const lang = token.info;
+    const lang = token.info.trim();
     if (lang in bundledLanguages) {
       assert(env && MarkdownParsingEnv.is(env));
       const placeholder = `<pre id="${randomUUIDv7()}">Waiting for rendering...</pre>`;
