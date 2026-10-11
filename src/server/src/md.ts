@@ -31,7 +31,11 @@ if (config.markdown.frontMatter) md.use(markdownFrontMatter);
 
 if (config.markdown.math) md.use(markdownKaTeX, config.katex);
 
-if (config.markdown.highlight) md.use(markdownShiki);
+if (config.markdown.highlight)
+  md.use(markdownShiki, {
+    injectLine: true,
+    ...config.shiki,
+  });
 
 if (config.markdown.attribute) md.use(markdownItAttrs);
 
@@ -42,6 +46,22 @@ export const parser: Parser = {
   parse(text) {
     const env: MarkdownParsingEnv = { replacements: [] };
     const html = md.render(text, env);
+    return { html, replacements: env.replacements };
+  },
+};
+
+const rmd = new MarkdownIt('commonmark');
+rmd.enable('table');
+rmd.enable('strikethrough');
+rmd.use(markdownFrontMatter);
+rmd.use(markdownKaTeX, config.katex);
+rmd.use(markdownShiki, { ...config.shiki });
+rmd.use(markdownMermaid, { className: config.mermaid.class });
+
+export const rmdParser: Parser = {
+  parse(text) {
+    const env: MarkdownParsingEnv = { replacements: [] };
+    const html = rmd.render(text, env);
     return { html, replacements: env.replacements };
   },
 };
