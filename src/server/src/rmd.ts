@@ -1,18 +1,18 @@
 import { waitParseResult, type Parser, type Replacement } from './shared.js';
-import { parser as markdownParser } from './md.js';
+import { rmdParser as markdownParser } from './md.js';
 import util from 'node:util';
 import childProcess from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { dirname, basename, join, isAbsolute } from 'node:path';
+import { dirname, basename, join } from 'node:path';
 import { readFile, writeFile } from 'node:fs/promises';
-import { randomUUIDv7 } from 'node:crypto';
+import { randomBytes, randomUUIDv7 } from 'node:crypto';
 import os from 'node:os';
 
 const exec = util.promisify(childProcess.exec);
 
 const placeholder = `<div id="${randomUUIDv7}">The Rmarkdown is rendering...</div>`;
 
-const tmpFileName = `tltmp-20299910`;
+const tmpFileName = `tl-${randomBytes(15).toString('hex')}`;
 
 async function render(text: string, uri: string): Promise<Replacement> {
   const tmpFilePath = join(os.tmpdir(), tmpFileName);
