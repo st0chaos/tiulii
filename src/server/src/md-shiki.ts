@@ -1,14 +1,14 @@
-import type { MarkdownIt } from "markdown-it";
-import { bundledLanguages, codeToHtml } from "shiki";
-import { MarkdownParsingEnv, type Replacement } from "./shared.js";
-import { randomUUIDv7 } from "node:crypto";
-import { config } from "./config.js";
-import { LINE_BEGIN_ATTR, LINE_END_ATTR } from "@tiulii/shared";
-import assert from "node:assert";
+import type { MarkdownIt } from 'markdown-it';
+import { bundledLanguages, codeToHtml } from 'shiki';
+import { MarkdownParsingEnv, type Replacement } from './shared.js';
+import { randomUUIDv7 } from 'node:crypto';
+import { config } from './config.js';
+import { LINE_BEGIN_ATTR, LINE_END_ATTR } from '@tiulii/shared';
+import assert from 'node:assert';
 
 export default (md: MarkdownIt) => {
-  const original = md.renderer.rules["fence"];
-  md.renderer.rules["fence"] = (tokens, idx, options, env, renderer) => {
+  const original = md.renderer.rules['fence'];
+  md.renderer.rules['fence'] = (tokens, idx, options, env, renderer) => {
     const token = tokens[idx]!;
     const code = token.content.trim();
     const lang = token.info;
@@ -41,6 +41,6 @@ export default (md: MarkdownIt) => {
     if (original) {
       return original(tokens, idx, options, env, renderer);
     }
-    return "";
+    return '';
   };
 };

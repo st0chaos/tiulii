@@ -6,18 +6,18 @@ import {
   type ServerMessage,
   type ServerMessageRegistry,
   type InitalizationParams,
-} from "@tiulii/shared";
-import mermaid from "mermaid";
+} from '@tiulii/shared';
+import mermaid from 'mermaid';
 
 mermaid.initialize({ startOnLoad: false });
 
-const app = document.createElement("div");
+const app = document.createElement('div');
 document.body.prepend(app);
 
 async function mermaidRender(element: Element) {
   const uuid = `mermaid-${crypto.randomUUID()}`;
   const { svg } = await mermaid.render(uuid, element.textContent);
-  let lineAttrs = "";
+  let lineAttrs = '';
   let line: string | null;
   if ((line = element.getAttribute(LINE_BEGIN_ATTR)) !== null)
     lineAttrs += ` ${LINE_BEGIN_ATTR}="${line}"`;
@@ -31,14 +31,14 @@ fetch(INIT_URL)
   .then((params: InitalizationParams) => {
     if (params.customCSS) {
       document.head.insertAdjacentHTML(
-        "afterbegin",
-        `<style>${params.customCSS}</style>`,
+        'afterbegin',
+        `<style>${params.customCSS}</style>`
       );
     }
     if (params.config.markdown.math) {
       document.head.insertAdjacentHTML(
-        "afterbegin",
-        '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css" integrity="sha384-u1zONI5gPXUx0UKI62c75/zww972y0v2rSK5ZYlVdS6xEuWDeZWUI66v6t1gvlXJ" crossorigin="anonymous" />',
+        'afterbegin',
+        '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.18.4/dist/katex.min.css" integrity="sha384-u1zONI5gPXUx0UKI62c75/zww972y0v2rSK5ZYlVdS6xEuWDeZWUI66v6t1gvlXJ" crossorigin="anonymous" />'
       );
     }
     if (params.config.mermaid.enable) {
@@ -51,12 +51,12 @@ fetch(INIT_URL)
       render(message) {
         app.innerHTML = message.html;
 
-        document.querySelectorAll("img").forEach((img) => {
-          img.addEventListener("click", () => {
+        document.querySelectorAll('img').forEach((img) => {
+          img.addEventListener('click', () => {
             if (!document.fullscreenElement) {
               img.requestFullscreen().catch((err) => {
                 console.error(
-                  `Error attempting to enable full-screen mode: ${err.message}`,
+                  `Error attempting to enable full-screen mode: ${err.message}`
                 );
               });
             } else {
@@ -67,7 +67,7 @@ fetch(INIT_URL)
 
         if (config.mermaid.enable) {
           for (const element of document.querySelectorAll(
-            `.${config.mermaid.class}`,
+            `.${config.mermaid.class}`
           )) {
             mermaidRender(element);
           }
@@ -78,7 +78,7 @@ fetch(INIT_URL)
         let target;
         let ratio = 0;
         for (const elm of app.querySelectorAll(
-          `[${LINE_BEGIN_ATTR}][${LINE_END_ATTR}]`,
+          `[${LINE_BEGIN_ATTR}][${LINE_END_ATTR}]`
         )) {
           const beg = parseInt(elm.getAttribute(LINE_BEGIN_ATTR)!, 10);
           const end = parseInt(elm.getAttribute(LINE_END_ATTR)!, 10);
@@ -98,7 +98,7 @@ fetch(INIT_URL)
           const H = window.innerHeight * config.scroll.top; // Move viewport slightly up
           window.scrollTo({
             top: T - H + rect.height * ratio,
-            behavior: "smooth",
+            behavior: 'smooth',
           });
         }
       },

@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - "ci/*"
+      - 'ci/*'
     paths:
       - src/shared/**
       - .github/workflows/deploy.yaml
@@ -15,7 +15,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v7
         with:
-          python-version: "3.14"
+          python-version: '3.14'
       - name: Install json-schema-for-humans
         run: pip install json-schema-for-humans
       - name: Install Node.js dependencies
@@ -47,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: "./public"
+          path: './public'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5

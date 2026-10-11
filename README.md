@@ -171,8 +171,8 @@ For example,
 ```javascript
 export default {
   port: 8000, // Port on which the HTTP server listens.
-  style: "./style.css",
-}
+  style: './style.css',
+};
 ```
 
 For more configuration options,
@@ -184,87 +184,87 @@ Here is my personal `style.css`.
 
 ```css
 :root {
-    --background: #ffffff;
-    --surface: #f8f9fa;
-    --border: #e9ecef;
-    --text-primary: #212529;
-    color-scheme: light;
+  --background: #ffffff;
+  --surface: #f8f9fa;
+  --border: #e9ecef;
+  --text-primary: #212529;
+  color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-    :root {
-        --background: #293136;
-        --surface: #333c43;
-        --border: #5d6b66;
-        --text-primary: #d3c6aa;
-        color-scheme: dark;
-    }
+  :root {
+    --background: #293136;
+    --surface: #333c43;
+    --border: #5d6b66;
+    --text-primary: #d3c6aa;
+    color-scheme: dark;
+  }
 }
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
-    transition:
-        background-color 0.3s ease,
-        border-color 0.3s ease,
-        color 0.3s ease;
+  box-sizing: border-box;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
 }
 body {
-    background-color: var(--background);
-    color: var(--text-primary);
-    font-family: serif;
-    padding: 2rem;
-    font-size: 19px;
-    line-height: 1.6;
-    max-width: 80ch;
-    margin: 0 auto;
-    text-wrap: pretty;
-    text-align: justify;
-    hyphens: auto;
-    hanging-punctuation: allow-end last;
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: serif;
+  padding: 2rem;
+  font-size: 19px;
+  line-height: 1.6;
+  max-width: 80ch;
+  margin: 0 auto;
+  text-wrap: pretty;
+  text-align: justify;
+  hyphens: auto;
+  hanging-punctuation: allow-end last;
 }
 h1 {
-    font-size: 2rem;
-    border-bottom: 1px solid var(--border);
-    text-align: center;
+  font-size: 2rem;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
 }
 h2 {
-    font-size: 1.5rem;
-    border-bottom: 1px solid var(--border);
+  font-size: 1.5rem;
+  border-bottom: 1px solid var(--border);
 }
 h3 {
-    font-size: 1.5rem;
+  font-size: 1.5rem;
 }
 h4 {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 blockquote {
-    margin: 0 0 1rem 0;
-    padding: 0 1rem;
-    border-left: 0.25rem solid var(--border);
+  margin: 0 0 1rem 0;
+  padding: 0 1rem;
+  border-left: 0.25rem solid var(--border);
 }
 code {
-    font-family: ui-monospace, monospace;
+  font-family: ui-monospace, monospace;
 }
 code:not(pre code) {
-    padding: 0.2em 0.2em;
-    background-color: var(--surface);
+  padding: 0.2em 0.2em;
+  background-color: var(--surface);
 }
 pre {
-    overflow: auto;
-    line-height: 1.2;
+  overflow: auto;
+  line-height: 1.2;
 }
 table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-bottom: 1rem;
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1rem;
 }
 th,
 td {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
 }
 img {
-    max-width: 100%;
-    height: auto;
+  max-width: 100%;
+  height: auto;
 }
 ```

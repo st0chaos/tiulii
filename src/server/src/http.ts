@@ -1,22 +1,22 @@
-import { join, dirname, extname } from "node:path";
+import { join, dirname, extname } from 'node:path';
 import {
   INIT_URL,
   SSE_URL,
   type InitalizationParams,
   type ServerMessage,
-} from "@tiulii/shared";
-import { config, cssFileContent } from "./config.js";
-import { currentHTML$, currentLine$, getActiveURI } from "./state.js";
-import { Hono } from "hono";
-import { serve } from "@hono/node-server";
-import { compress } from "hono/compress";
-import { serveStatic } from "@hono/node-server/serve-static";
-import { SSEStreamingApi, streamSSE } from "hono/streaming";
-import { fileURLToPath } from "node:url";
-import { Readable } from "node:stream";
-import { createReadStream } from "node:fs";
-import { access } from "node:fs/promises";
-import constants from "node:constants";
+} from '@tiulii/shared';
+import { config, cssFileContent } from './config.js';
+import { currentHTML$, currentLine$, getActiveURI } from './state.js';
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server';
+import { compress } from 'hono/compress';
+import { serveStatic } from '@hono/node-server/serve-static';
+import { SSEStreamingApi, streamSSE } from 'hono/streaming';
+import { fileURLToPath } from 'node:url';
+import { Readable } from 'node:stream';
+import { createReadStream } from 'node:fs';
+import { access } from 'node:fs/promises';
+import constants from 'node:constants';
 
 const app = new Hono();
 
@@ -37,16 +37,16 @@ app.get(SSE_URL, async (c) => {
 
   return streamSSE(c, async (stream) => {
     const heartBeat = setInterval(() => {
-      stream.write(": heartbeat.\n\n");
+      stream.write(': heartbeat.\n\n');
     }, 15 * 1000);
 
     const updateSub = currentHTML$.subscribe((html) => {
-      sendEvent(stream, { method: "render", html: html ?? "Null" });
+      sendEvent(stream, { method: 'render', html: html ?? 'Null' });
     });
 
     const scrollSub = currentLine$.subscribe((line) => {
       if (line === undefined) return;
-      sendEvent(stream, { method: "scroll", line });
+      sendEvent(stream, { method: 'scroll', line });
     });
 
     await new Promise<void>((resolve) =>
@@ -55,21 +55,21 @@ app.get(SSE_URL, async (c) => {
         updateSub.unsubscribe();
         clearInterval(heartBeat);
         resolve();
-      }),
+      })
     );
   });
 });
 
-const scriptURL = "/static/index.js";
+const scriptURL = '/static/index.js';
 
 app.use(
   scriptURL,
   serveStatic({
-    path: join(dirname(import.meta.filename), "index.js"),
-  }),
+    path: join(dirname(import.meta.filename), 'index.js'),
+  })
 );
 
-app.get("/", (c) => {
+app.get('/', (c) => {
   return c.html(`
     <!doctype html>
     <html>
@@ -82,17 +82,17 @@ app.get("/", (c) => {
   `);
 });
 
-app.get(":image{.+\\.(?:png|jpeg|gif|webp|bmp|avif|tiff)$}", async (c) => {
+app.get(':image{.+\\.(?:png|jpeg|gif|webp|bmp|avif|tiff)$}', async (c) => {
   const activeURI = getActiveURI();
   if (activeURI === undefined) return c.notFound();
   const activePath = fileURLToPath(activeURI);
-  if (activePath === "/") return c.notFound();
-  const imagePath = c.req.param("image");
+  if (activePath === '/') return c.notFound();
+  const imagePath = c.req.param('image');
   const extension = extname(imagePath).slice(1);
   const filePath = join(dirname(activePath), imagePath);
   try {
     await access(filePath, constants.F_OK);
-    c.header("Content-Type", `image/${extension}`);
+    c.header('Content-Type', `image/${extension}`);
     return c.body(Readable.toWeb(createReadStream(filePath)));
   } catch {
     return c.notFound();

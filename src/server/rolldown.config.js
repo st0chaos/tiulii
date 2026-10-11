@@ -1,14 +1,14 @@
-import { defineConfig } from "rolldown";
-import path from "node:path";
+import { defineConfig } from 'rolldown';
+import path from 'node:path';
 
 export default defineConfig({
-  input: "src/cli.ts",
+  input: 'src/cli.ts',
   output: {
-    format: "esm",
+    format: 'esm',
   },
   transform: {
-    target: "node18",
+    target: 'node18',
   },
   external: (id) =>
-    !id.startsWith("@tiulii") && !id.startsWith(".") && !path.isAbsolute(id),
+    !id.startsWith('@tiulii') && !id.startsWith('.') && !path.isAbsolute(id),
 });

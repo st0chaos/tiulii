@@ -1,6 +1,6 @@
-import { type MarkdownIt, type StateBlock } from "markdown-it";
+import { type MarkdownIt, type StateBlock } from 'markdown-it';
 
-const frontMatterTokenType = "front_matter";
+const frontMatterTokenType = 'front_matter';
 
 export interface FrontMatterDecl {
   delimiter: string;
@@ -8,15 +8,15 @@ export interface FrontMatterDecl {
 }
 
 const frontMatterFormatRegistry: FrontMatterDecl[] = [
-  { delimiter: "---", format: "yaml" },
-  { delimiter: "+++", format: "toml" },
+  { delimiter: '---', format: 'yaml' },
+  { delimiter: '+++', format: 'toml' },
 ] as const;
 
 function parseFrontMatter(
   state: StateBlock,
   startLine: number,
   endLine: number,
-  silent: boolean,
+  silent: boolean
 ): boolean {
   if (startLine !== 0) return false;
 
@@ -57,7 +57,7 @@ function parseFrontMatter(
   const contentStart = state.bMarks[startLine + 1];
   const contentEnd = state.bMarks[nextLine];
   const rawContent = state.src.slice(contentStart, contentEnd);
-  const token = state.push(frontMatterTokenType, "front_matter", 0);
+  const token = state.push(frontMatterTokenType, 'front_matter', 0);
   token.block = true;
   token.content = rawContent;
   token.map = [startLine, nextLine];
@@ -68,10 +68,10 @@ function parseFrontMatter(
 }
 
 export default function (md: MarkdownIt) {
-  md.block.ruler.before("code", "front_matter", parseFrontMatter, {
-    alt: ["paragraph", "reference", "blockquote"],
+  md.block.ruler.before('code', 'front_matter', parseFrontMatter, {
+    alt: ['paragraph', 'reference', 'blockquote'],
   });
   md.renderer.rules[frontMatterTokenType] = () => {
-    return "";
+    return '';
   };
 }
