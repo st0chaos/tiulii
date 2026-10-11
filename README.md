@@ -8,15 +8,17 @@
 
 - Lively update changes in your browser as you type.
 - Configurable using JavaScript.
-- Preview Markdown:
+- Preview Markdown and R Markdown:
   - Base on CommonMark with extensible supports for tables, strikethrough,
     front matter, and attributes.
-  - Synchronized scrolling.
+  - Synchronized scrolling (not support R Markdown yet).
   - Math support via [KaTeX](https://katex.org) with custom macro support.
   - Syntax highlighting powered by [Shiki](https://shiki.style).
   - Mermaid support.
 
 ## Installation
+
+To preview R Markdown files, install [knitr](https://cran.r-project.org/web/packages/knitr).
 
 ### Install via Nix
 
@@ -52,12 +54,12 @@ local group = vim.api.nvim_create_augroup(server_name, { clear = true })
 ---@type vim.lsp.Config
 return {
   cmd = { server_name, '--stdio' },
-  filetypes = { 'markdown' },
+  filetypes = { 'markdown', 'rmd' },
 
   on_init = function(client, _)
     vim.api.nvim_create_autocmd('BufEnter', {
       group = group,
-      pattern = { '*.md' },
+      pattern = { '*.md', '*.rmd', '*.Rmd' },
       callback = function(ctx)
         client:notify(server_name .. '/didChangeView', {
           uri = vim.uri_from_bufnr(ctx.buf),
@@ -67,10 +69,11 @@ return {
 
     vim.api.nvim_create_autocmd('CursorHold', {
       group = group,
-      pattern = { '*.md' },
-      callback = function()
+      pattern = { '*.md', '*.rmd', '*.Rmd' },
+      callback = function(ctx)
         client:notify(server_name .. '/didMoveCursor', {
           line = vim.fn.line('.') - 1,
+          uri = vim.uri_from_bufnr(ctx.buf),
         })
       end,
     })
@@ -78,12 +81,9 @@ return {
 
   on_attach = function(client, bufnr)
     -- Use your preferred key here.
-    vim.keymap.set(
-      'n',
-      '<LocalLeader><LocalLeader>',
-      function() client:notify(server_name .. '/openPreviewURL', {}) end,
-      { buf = bufnr, desc = 'Live preview' }
-    )
+    vim.keymap.set('n', 'gP', function()
+      client:notify(server_name .. '/openPreviewURL', {})
+    end, { buf = bufnr, desc = 'Live preview' })
   end,
 
   on_exit = function() vim.api.nvim_clear_autocmds({ group = group }) end,
