@@ -88,7 +88,7 @@ async function tryAccessFiles(files: string[]) {
   );
 }
 
-app.get(':image{.+\\.(?:png|jpeg|gif|webp|bmp|avif|tiff)$}', async (c) => {
+app.get(':image{.+\\.(?:png|jpeg|gif|webp|bmp|avif|tiff|svg)$}', async (c) => {
   const activeURI = getActiveURI();
   if (activeURI === undefined) return c.notFound();
   const activePath = fileURLToPath(activeURI);
@@ -101,7 +101,10 @@ app.get(':image{.+\\.(?:png|jpeg|gif|webp|bmp|avif|tiff)$}', async (c) => {
       join(dirname(activePath), image),
       '/' + image,
     ]);
-    c.header('Content-Type', `image/${extension}`);
+    c.header(
+      'Content-Type',
+      `image/${extension === 'svg' ? 'svg+xml' : extension}`
+    );
     return c.body(Readable.toWeb(createReadStream(file)));
   } catch {
     return c.notFound();
