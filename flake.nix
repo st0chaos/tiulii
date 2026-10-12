@@ -26,6 +26,7 @@
             pkgs.nodejs
             pkgs.typescript-language-server
             pkgs.prettier
+            pkgs.neovim
           ];
         };
       }

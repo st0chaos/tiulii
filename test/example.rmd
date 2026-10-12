@@ -1,0 +1,48 @@
+---
+title: "R Markdown Sample"
+author: "Data Analyst"
+date: "`r Sys.Date()`"
+---
+
+## Introduction
+
+This is a sample R Markdown document that relies entirely on
+**built-in R functions** and datasets. No external packages like
+`ggplot2` or `dplyr` are required to knit this file.
+
+## Summary of the Data
+
+We will use the built-in `mtcars` dataset. Here is a quick statistical
+summary of the data:
+
+```{r summary}
+summary(mtcars)
+```
+
+## Data Visualization
+
+Below is a scatter plot showing the relationship between a car's
+weight (`wt`) and its miles per gallon (`mpg`), generated using R's
+built-in `plot()` function.
+
+```{r plot, echo=TRUE}
+plot(mtcars$wt, mtcars$mpg,
+     main = "Weight vs. Fuel Efficiency",
+     xlab = "Weight (1000 lbs)",
+     ylab = "Miles Per Gallon (MPG)",
+     pch = 19,
+     col = "blue")
+
+# Add a simple linear regression trend line
+abline(lm(mpg ~ wt, data = mtcars), col = "red", lwd = 2)
+```
+
+## Simple Data Manipulation
+
+Here we filter the dataset to show only cars with more than 200
+horsepower using standard R indexing:
+
+```{r filtering}
+high_power <- mtcars[mtcars$hp > 200, c("mpg", "cyl", "hp")]
+high_power
+```
