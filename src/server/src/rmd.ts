@@ -12,16 +12,20 @@ const execFile = util.promisify(childProcess.execFile);
 const placeholder = `<div id="${randomUUIDv7}">The Rmarkdown is rendering...</div>`;
 
 async function render(text: string, uri: string): Promise<Replacement> {
-  const inPath = fileURLToPath(uri);
-  const workingDirectory = dirname(inPath);
-  const baseName = basename(inPath);
-  const outPath = join(workingDirectory, baseName + '.knit.md');
-  const figDirectoryName = `${baseName}.knit.d/`;
+  const inputPath = fileURLToPath(uri);
+  const workingDirectory = dirname(inputPath);
+  const baseName = basename(inputPath);
+  const dataDirectoryName = baseName + '.knit.d/';
+  const outPath = join(
+    workingDirectory,
+    dataDirectoryName,
+    baseName + '.knit.md'
+  );
   try {
     const knitScript = `
     library(knitr);
     opts_knit$set(base.dir="${workingDirectory}");
-    opts_chunk$set(fig.path="${figDirectoryName}");
+    opts_chunk$set(fig.path="${dataDirectoryName}");
     knit(text=r"--------[${text}]--------", output="${outPath}");
     `;
     await execFile('Rscript', ['-e', knitScript]);
