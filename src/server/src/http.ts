@@ -82,18 +82,27 @@ app.get('/', (c) => {
   `);
 });
 
+async function tryAccessFiles(files: string[]) {
+  return await Promise.any(
+    files.map((file) => access(file, constants.F_OK).then((_) => file))
+  );
+}
+
 app.get(':image{.+\\.(?:png|jpeg|gif|webp|bmp|avif|tiff)$}', async (c) => {
   const activeURI = getActiveURI();
   if (activeURI === undefined) return c.notFound();
   const activePath = fileURLToPath(activeURI);
   if (activePath === '/') return c.notFound();
-  const imagePath = c.req.param('image');
-  const extension = extname(imagePath).slice(1);
-  const filePath = join(dirname(activePath), imagePath);
+
+  const image = c.req.param('image');
+  const extension = extname(image).slice(1);
   try {
-    await access(filePath, constants.F_OK);
+    const file = await tryAccessFiles([
+      join(dirname(activePath), image),
+      '/' + image,
+    ]);
     c.header('Content-Type', `image/${extension}`);
-    return c.body(Readable.toWeb(createReadStream(filePath)));
+    return c.body(Readable.toWeb(createReadStream(file)));
   } catch {
     return c.notFound();
   }
