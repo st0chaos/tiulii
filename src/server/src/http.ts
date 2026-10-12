@@ -105,6 +105,12 @@ app.get(':image{.+\\.(?:png|jpeg|gif|webp|bmp|avif|tiff|svg)$}', async (c) => {
       'Content-Type',
       `image/${extension === 'svg' ? 'svg+xml' : extension}`
     );
+    c.header(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, proxy-revalidate'
+    );
+    c.header('Pragma', 'no-cache');
+    c.header('Expires', '0');
     return c.body(Readable.toWeb(createReadStream(file)));
   } catch {
     return c.notFound();
