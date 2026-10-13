@@ -8,7 +8,8 @@
   "description": "A LSP server for previewing.",
   "scripts": {
     "build": "tsc && rolldown -c",
-    "prepublishOnly": "cp ../../README.md ../../LICENSE ."
+    "prepublishOnly": "cp ../../README.md ../../LICENSE .",
+    "postpublish": "rm README.md LICENSE"
   },
   "bin": {
     "tiulii": "dist/cli.js"
