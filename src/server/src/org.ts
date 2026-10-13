@@ -6,11 +6,13 @@ import { type Parser, type Replacement } from './shared.js';
 import { randomUUIDv7 } from 'node:crypto';
 import { config } from './config.ts';
 import rehypeKatex from 'rehype-katex';
+import rehypeShiki from '@shikijs/rehype';
 
 const processor = unified()
   .use(uniorgParse)
   .use(uniorgRehype)
   .use(rehypeKatex, { macros: {}, ...config.katex })
+  .use(rehypeShiki, config.shiki)
   .use(stringify);
 
 const placeholder = `<div id="${randomUUIDv7}">The Org file is rendering...</div>`;
