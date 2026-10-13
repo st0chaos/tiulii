@@ -14,8 +14,12 @@
   "bin": {
     "tiulii": "dist/cli.js"
   },
-  "files": ["dist"],
-  "keywords": ["LSP"],
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "LSP"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/st0chaos/tiulii.git"
