@@ -2,14 +2,15 @@
   "name": "@tiulii/web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "tsc && rolldown -c"
   },
   "dependencies": {
-    "@tiulii/shared": "*",
     "mermaid": "^11.17.2"
   },
   "devDependencies": {
+    "@tiulii/shared": "*",
     "rolldown": "^1.2.7",
     "typescript": "6.0.3"
   }
