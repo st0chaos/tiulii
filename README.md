@@ -28,6 +28,12 @@ Supported file formats and their features:
 
 To preview R Markdown files, install [knitr](https://cran.r-project.org/web/packages/knitr).
 
+### Install from npm
+
+```bash
+npm i -g tiulii
+```
+
 ### Install via Nix
 
 ```bash
