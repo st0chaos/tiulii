@@ -7,14 +7,22 @@
 ## Features
 
 - Lively update changes in your browser as you type.
+- Synchronized scrolling.
+- Math support via [KaTeX](https://katex.org) with custom macro support.
+- Syntax highlighting powered by [Shiki](https://shiki.style).
+- [Mermaid](https://mermaid.js.org) support.
 - Configurable using JavaScript.
-- Preview Markdown and R Markdown:
-  - Base on CommonMark with extensible supports for tables, strikethrough,
-    front matter, and attributes.
-  - Synchronized scrolling (not support R Markdown yet).
-  - Math support via [KaTeX](https://katex.org) with custom macro support.
-  - Syntax highlighting powered by [Shiki](https://shiki.style).
-  - Mermaid support.
+- Preview Org files.
+- Preview Markdown and R Markdown, based on CommonMark with extensible
+  supports for tables, strikethrough, front matter, and attributes.
+
+Supported file formats and their features:
+
+| Format     | Lively update | Sync scrolling | KaTeX | Syntax highlighting | Mermaid |
+| :--------- | :-----------: | :------------: | :---: | :-----------------: | :-----: |
+| Markdown   |      Yes      |      Yes       |  Yes  |         Yes         |   Yes   |
+| R Markdown |      Yes      |                |  Yes  |         Yes         |   Yes   |
+| Org        |      Yes      |                |  Yes  |         Yes         |         |
 
 ## Installation
 
