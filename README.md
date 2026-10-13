@@ -62,12 +62,12 @@ local group = vim.api.nvim_create_augroup(server_name, { clear = true })
 ---@type vim.lsp.Config
 return {
   cmd = { server_name, '--stdio' },
-  filetypes = { 'markdown', 'rmd' },
+  filetypes = { 'markdown', 'rmd', 'org' },
 
   on_init = function(client, _)
     vim.api.nvim_create_autocmd('BufEnter', {
       group = group,
-      pattern = { '*.md', '*.rmd', '*.Rmd' },
+      pattern = { '*.md', '*.rmd', '*.Rmd', '*.org' },
       callback = function(ctx)
         client:notify(server_name .. '/didChangeView', {
           uri = vim.uri_from_bufnr(ctx.buf),
@@ -77,7 +77,7 @@ return {
 
     vim.api.nvim_create_autocmd('CursorHold', {
       group = group,
-      pattern = { '*.md', '*.rmd', '*.Rmd' },
+      pattern = { '*.md', '*.rmd', '*.Rmd', '*.org' },
       callback = function(ctx)
         client:notify(server_name .. '/didMoveCursor', {
           line = vim.fn.line('.') - 1,
@@ -162,7 +162,8 @@ Add the following code to your `user-lisp-directory` or your init file.
                   (setq tiulii--timer nil))))))
 
 (with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs '(markdown-mode . ("tiulii" "--stdio"))))
+  (add-to-list 'eglot-server-programs '(markdown-mode . ("tiulii" "--stdio")))
+  (add-to-list 'eglot-server-programs '(org-mode . ("tiulii" "--stdio"))))
 ```
 
 ## Configuration
