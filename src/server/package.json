@@ -13,8 +13,12 @@
     "markdown-it": "^15.0.0",
     "markdown-it-attrs": "^5.0.1",
     "open": "^11.0.1",
+    "rehype-stringify": "^10.0.1",
     "rxjs": "^7.8.2",
     "shiki": "^4.4.3",
+    "unified": "^11.0.5",
+    "uniorg-parse": "^3.2.2",
+    "uniorg-rehype": "^2.2.0",
     "vscode-languageserver": "^10.1.0",
     "vscode-languageserver-textdocument": "^1.0.14"
   },

@@ -3,12 +3,12 @@ local group = vim.api.nvim_create_augroup(server_name, { clear = true })
 ---@type vim.lsp.Config
 local cfg = {
   cmd = { './src/server/dist/cli.js', '--stdio' },
-  filetypes = { 'markdown', 'rmd' },
+  filetypes = { 'markdown', 'rmd', 'org' },
 
   on_init = function(client, _)
     vim.api.nvim_create_autocmd('BufEnter', {
       group = group,
-      pattern = { '*.md', '*.rmd', '*.Rmd' },
+      pattern = { '*.md', '*.rmd', '*.Rmd', '*.org' },
       callback = function(ctx)
         client:notify(server_name .. '/didChangeView', {
           uri = vim.uri_from_bufnr(ctx.buf),
@@ -18,7 +18,7 @@ local cfg = {
 
     vim.api.nvim_create_autocmd('CursorHold', {
       group = group,
-      pattern = { '*.md', '*.rmd', '*.Rmd' },
+      pattern = { '*.md', '*.rmd', '*.Rmd', '*.org' },
       callback = function(ctx)
         client:notify(server_name .. '/didMoveCursor', {
           line = vim.fn.line('.') - 1,
