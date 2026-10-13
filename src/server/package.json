@@ -2,9 +2,19 @@
   "name": "tiulii",
   "version": "0.1.0",
   "type": "module",
+  "main": "dist/cli.js",
+  "author": "st0chaos <st0chaos@posteo.com>",
+  "license": "GPL-3.0-or-later",
+  "description": "A LSP server for previewing.",
   "scripts": {
-    "build": "tsc && rolldown -c"
+    "build": "tsc && rolldown -c",
+    "prepublishOnly": "cp ../../README.md ../../LICENSE ."
   },
+  "bin": {
+    "tiulii": "dist/cli.js"
+  },
+  "files": ["dist"],
+  "keywords": ["LSP"],
   "dependencies": {
     "@hono/node-server": "^2.1.1",
     "@shikijs/rehype": "^4.5.0",
