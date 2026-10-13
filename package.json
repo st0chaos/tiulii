@@ -1,6 +1,7 @@
 {
   "name": "@tiulii/repo",
   "version": "0.1.0",
+  "private": true,
   "workspaces": ["src/*"],
   "scripts": {
     "build": "npm run build -w src/shared && npm run build -w src/client && npm run build -w src/server"
