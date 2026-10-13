@@ -15,6 +15,10 @@
   },
   "files": ["dist"],
   "keywords": ["LSP"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/st0chaos/tiulii.git"
+  },
   "dependencies": {
     "@hono/node-server": "^2.1.1",
     "@shikijs/rehype": "^4.5.0",
