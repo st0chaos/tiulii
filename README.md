@@ -60,7 +60,7 @@ ln --symbolic "$(realpath ./src/server/dist/cli.js)" /path/to/your/bin/tiulii
 
 ### Neovim 0.11+
 
-Create the configuration file at `.config/nvim/lsp/tiulii.lua`:
+Create the configuration file at `~/.config/nvim/lsp/tiulii.lua`:
 
 ```lua
 local server_name = 'tiulii'
@@ -94,8 +94,7 @@ return {
   end,
 
   on_attach = function(client, bufnr)
-    -- Use your preferred key here.
-    vim.keymap.set('n', 'gP', function()
+    vim.keymap.set('n', 'gb', function() -- Use your preferred key here.
       client:notify(server_name .. '/openPreviewURL', {})
     end, { buf = bufnr, desc = 'Live preview' })
   end,
@@ -228,7 +227,7 @@ body {
   color: var(--text-primary);
   font-family: serif;
   padding: 2rem;
-  font-size: 19px;
+  font-size: 17px;
   line-height: 1.6;
   max-width: 80ch;
   margin: 0 auto;
