@@ -39,7 +39,7 @@ if (config.markdown.highlight)
 
 if (config.markdown.attribute) md.use(markdownItAttrs);
 
-if (config.mermaid.enable)
+if (config.markdown.mermaid)
   md.use(markdownMermaid, { className: config.mermaid.class });
 
 export const parser: Parser = {
@@ -62,9 +62,9 @@ rmd.use(markdownKaTeX, config.katex);
 
 rmd.use(markdownShiki, config.shiki);
 
-if (config.markdown.attribute) rmd.use(markdownItAttrs);
+if (config.rmarkdown.attribute) rmd.use(markdownItAttrs);
 
-if (config.mermaid.enable)
+if (config.rmarkdown.mermaid)
   rmd.use(markdownMermaid, { className: config.mermaid.class });
 
 export const rmdParser: Parser = {
