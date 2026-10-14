@@ -102,18 +102,18 @@ it will scroll to the proportional position of the current line within the total
           .min(1)
           .optional()
           .transform((value) => value ?? `${SERVER_NAME}-mermaid`)
-          .describe('Class name for mermaid elements.'),
+          .describe('HTML class name for mermaid elements.'),
         options: z
           .record(z.string(), z.any())
           .default({})
           .describe(
-            'Additional Mermaid configuration options. See <https://mermaid.ai/open-source/config/schema-docs/config.html>'
+            'Additional Mermaid configuration options. See <https://mermaid.ai/open-source/config/schema-docs/config.html>.'
           ),
       })
       .prefault({})
       .describe('Mermaid configuration options.'),
   })
-  .describe('Configuration options for tiulii.');
+  .describe('Configuration options for `Tiulii`.');
 
 export type Config = z.infer<typeof configSchema>;
 
