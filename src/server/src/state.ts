@@ -38,7 +38,7 @@ export interface DidMoveCursorParams {
 export const open$ = new Subject<DidOpenTextDocumentParams>();
 export const close$ = new Subject<DidCloseTextDocumentParams>();
 export const change$ = new Subject<DidChangeTextDocumentParams>();
-export const cursor$ = new Subject<DidMoveCursorParams>();
+export const cursorMoved$ = new Subject<DidMoveCursorParams>();
 
 function parseIntoStream(
   parser: Parser,
@@ -70,11 +70,9 @@ interface UpdateLineEvent {
 type UpdateEvent = UpdateHTMLEvent | UpdateLineEvent;
 
 const updates$: Observable<UpdateEvent> = open$.pipe(
-  mergeMap((openParams) => {
-    const { uri, languageId, text } = openParams.textDocument;
+  mergeMap(({ textDocument: { uri, languageId, text } }) => {
     let version = 0;
     const textDocument = TextDocument.create(uri, languageId, version, text);
-
     const parser = getParser(languageId);
     if (!parser) return EMPTY;
 
@@ -82,13 +80,13 @@ const updates$: Observable<UpdateEvent> = open$.pipe(
       filter((params) => params.textDocument.uri === uri)
     );
 
-    const initialHtmlUpdates$: Observable<UpdateHTMLEvent> = parseIntoStream(
+    const initialHTMLUpdate$: Observable<UpdateHTMLEvent> = parseIntoStream(
       parser,
       text,
       uri
     ).pipe(map((html) => ({ kind: 'html', uri: uri, html: html })));
 
-    const followingHtmlUpdates$: Observable<UpdateHTMLEvent> = change$
+    const upcomingHTMLUpdate$: Observable<UpdateHTMLEvent> = change$
       .pipe(
         filter((params) => params.textDocument.uri === uri),
         map((params) => params.contentChanges),
@@ -114,12 +112,7 @@ const updates$: Observable<UpdateEvent> = open$.pipe(
         endWith({ kind: 'html', uri: uri, html: undefined } as UpdateHTMLEvent)
       );
 
-    const htmlUpdates$: Observable<UpdateHTMLEvent> = concat(
-      initialHtmlUpdates$,
-      followingHtmlUpdates$
-    );
-
-    const lineUpdates$: Observable<UpdateLineEvent> = cursor$.pipe(
+    const lineUpdate$: Observable<UpdateLineEvent> = cursorMoved$.pipe(
       filter((params) => params.uri === uri),
       map(
         (params) =>
@@ -128,7 +121,7 @@ const updates$: Observable<UpdateEvent> = open$.pipe(
       takeUntil(closeThis$)
     );
 
-    return merge(htmlUpdates$, lineUpdates$);
+    return merge(concat(initialHTMLUpdate$, upcomingHTMLUpdate$), lineUpdate$);
   })
 );
 

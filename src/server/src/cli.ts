@@ -11,7 +11,7 @@ import {
   setActiveURI,
   close$,
   open$,
-  cursor$,
+  cursorMoved$,
   type DidMoveCursorParams,
 } from './state.js';
 import { httpServer } from './http.js';
@@ -54,7 +54,7 @@ connection.onNotification(
 connection.onNotification(
   new NotificationType<DidMoveCursorParams>(`${SERVER_NAME}/didMoveCursor`),
   (params) => {
-    cursor$.next(params);
+    cursorMoved$.next(params);
   }
 );
 
