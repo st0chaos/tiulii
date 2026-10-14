@@ -45,7 +45,7 @@ app.get(SSE_URL, async (c) => {
 
     const scrollSub = currentLine$.subscribe((line) => {
       if (line === undefined) return;
-      sendEvent(stream, { method: 'scroll', line });
+      sendEvent(stream, { method: 'scroll', ...line });
     });
 
     await new Promise<void>((resolve) =>
