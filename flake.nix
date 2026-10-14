@@ -17,9 +17,9 @@
       {
         packages.default = pkgs.buildNpmPackage {
           pname = "tiulii";
-          version = "0.1.0";
+          version = "0.2.1";
           src = ./.;
-          npmDepsHash = "sha256-7OIoxfh8Vi/zVtcwD2dZE6NaoJWkSpplM7oezKIiYqg=";
+          npmDepsHash = "sha256-L+Un5iPYToMjiWqKz6nAyfA1J8f3c8LI33DfvUp9dKU=";
         };
         devShells.default = pkgs.mkShell {
           packages = [
