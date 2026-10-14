@@ -29,6 +29,7 @@ import {
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { getParser } from './parser.js';
 import type { Parser } from './shared.js';
+import { config } from './config.ts';
 
 export interface DidMoveCursorParams {
   line: number;
@@ -93,7 +94,7 @@ const updates$: Observable<UpdateEvent> = open$.pipe(
     );
 
     const upcomingHTMLUpdate$: Observable<UpdateHTMLEvent> = changeThis$.pipe(
-      buffer(changeThis$.pipe(debounceTime(300))),
+      buffer(changeThis$.pipe(debounceTime(config.debounceTime))),
       map((collection) => collection.flat()),
       filter((changes) => changes.length !== 0),
       map((changes) => {

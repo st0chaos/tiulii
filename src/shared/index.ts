@@ -12,6 +12,9 @@ export const configSchema = z
       .string()
       .optional()
       .describe('Path to the custom CSS file relative to the user directory.'),
+    debounceTime: z.number().min(0).default(300)
+      .describe(`The specific period of time (in millisecond)
+during which no editing to the document will trigger rendering.`),
     markdown: z
       .object({
         table: z
