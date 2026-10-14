@@ -86,7 +86,7 @@ return {
       pattern = { '*.md', '*.rmd', '*.Rmd', '*.org' },
       callback = function(ctx)
         client:notify(server_name .. '/didMoveCursor', {
-          line = vim.fn.line('.') - 1,
+          line = vim.fn.line('.'),
           uri = vim.uri_from_bufnr(ctx.buf),
         })
       end,
@@ -137,7 +137,7 @@ Add the following code to your `user-lisp-directory` or your init file.
         (file-name (buffer-file-name)))
     (when (and buffer file-name tiulii--flag)
       (jsonrpc-notify (eglot-current-server) :tiulii/didMoveCursor
-                      (list :line (1- (line-number-at-pos nil t))
+                      (list :line (line-number-at-pos nil t)
                             :uri (eglot-path-to-uri file-name))))))
 
 (defun tiulii--preview ()

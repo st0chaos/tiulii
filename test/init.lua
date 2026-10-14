@@ -21,7 +21,7 @@ local cfg = {
       pattern = { '*.md', '*.rmd', '*.Rmd', '*.org' },
       callback = function(ctx)
         client:notify(server_name .. '/didMoveCursor', {
-          line = vim.fn.line('.') - 1,
+          line = vim.fn.line('.'),
           uri = vim.uri_from_bufnr(ctx.buf),
         })
       end,
