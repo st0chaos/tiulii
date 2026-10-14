@@ -46,3 +46,9 @@ horsepower using standard R indexing:
 high_power <- mtcars[mtcars$hp > 200, c("mpg", "cyl", "hp")]
 high_power
 ```
+
+## Table
+
+```{r echo = FALSE}
+knitr::kable(mtcars[1:5, ])
+```
