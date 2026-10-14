@@ -87,6 +87,7 @@ return {
       callback = function(ctx)
         client:notify(server_name .. '/didMoveCursor', {
           line = vim.fn.line('.'),
+          maxLine = vim.api.nvim_buf_line_count(ctx.buf),
           uri = vim.uri_from_bufnr(ctx.buf),
         })
       end,
@@ -114,9 +115,9 @@ vim.lsp.enable('tiulii')
 Add the following code to your `user-lisp-directory` or your init file.
 
 ```elisp
-(defvar tiulii-preview-key "C-c p"
+(defvar tiulii-preview-key "C-c v"
   "Key to start a preview page.")
-(defvar tiulii-idle-time 0.5
+(defvar tiulii-idle-time 0.3
   "Time interval of sending the line number where the cursor is located.")
 (defvar-local tiulii--flag nil)
 (defvar tiulii--buffer-count 0)
@@ -138,9 +139,12 @@ Add the following code to your `user-lisp-directory` or your init file.
     (when (and buffer file-name tiulii--flag)
       (jsonrpc-notify (eglot-current-server) :tiulii/didMoveCursor
                       (list :line (line-number-at-pos nil t)
+                            :maxLine (save-restriction
+                                      (widen)
+                                      (count-lines (point-min) (point-max)))
                             :uri (eglot-path-to-uri file-name))))))
 
-(defun tiulii--preview ()
+(defun tiulii-preview ()
   (interactive)
   (jsonrpc-notify (eglot-current-server) :tiulii/openPreviewURL nil))
 
@@ -151,7 +155,7 @@ Add the following code to your `user-lisp-directory` or your init file.
                   (when (tiulii--managed-p)
                     (setq-local tiulii--flag t)
                     (cl-incf tiulii--buffer-count)
-                    (keymap-local-set tiulii-preview-key #'tiulii--preview)
+                    (keymap-local-set tiulii-preview-key #'tiulii-preview)
                     (when (= 1 tiulii--buffer-count)
                       (add-hook 'window-buffer-change-functions
                                 #'tiulii--on-window-buffer-change)
