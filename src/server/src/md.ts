@@ -39,8 +39,7 @@ if (config.markdown.highlight)
 
 if (config.markdown.attribute) md.use(markdownItAttrs);
 
-if (config.markdown.mermaid)
-  md.use(markdownMermaid, { className: config.mermaid.class });
+if (config.markdown.mermaid) md.use(markdownMermaid, config.mermaid);
 
 export const parser: Parser = {
   parse(text) {
@@ -64,8 +63,7 @@ rmd.use(markdownShiki, config.shiki);
 
 if (config.rmarkdown.attribute) rmd.use(markdownItAttrs);
 
-if (config.rmarkdown.mermaid)
-  rmd.use(markdownMermaid, { className: config.mermaid.class });
+if (config.rmarkdown.mermaid) rmd.use(markdownMermaid, config.mermaid);
 
 export const rmdParser: Parser = {
   parse(text) {

@@ -2,7 +2,7 @@ import type { MarkdownIt } from 'markdown-it';
 import { LINE_BEGIN_ATTR, LINE_END_ATTR } from '@tiulii/shared';
 
 interface MermaidOptions {
-  className: string;
+  class: string;
 }
 
 export default (md: MarkdownIt, mermaidOptions: MermaidOptions) => {
@@ -17,7 +17,7 @@ export default (md: MarkdownIt, mermaidOptions: MermaidOptions) => {
         const [beg, end] = token.map;
         lineInfo = ` ${LINE_BEGIN_ATTR}="${beg}" ${LINE_END_ATTR}="${end}"`;
       }
-      return `<pre class="${mermaidOptions.className}"${lineInfo}>${code}</pre>`;
+      return `<pre class="${mermaidOptions.class}"${lineInfo}>${code}</pre>`;
     }
     if (original) {
       return original(tokens, idx, options, env, renderer);
