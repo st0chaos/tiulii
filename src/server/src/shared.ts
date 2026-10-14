@@ -1,6 +1,8 @@
 // import type { TextDocumentContentChangeEvent } from "vscode-languageserver";
 
 import type { Env } from 'markdown-it';
+import constants from 'node:constants';
+import { access } from 'node:fs/promises';
 
 export interface Replacement {
   placeholder: string;
@@ -31,6 +33,12 @@ export async function waitParseResult(result: ParseResult) {
   return rep.reduce(
     (acc, curr) => acc.replaceAll(curr.placeholder, curr.content),
     result.html
+  );
+}
+
+export async function tryAccessFiles(files: string[]) {
+  return await Promise.any(
+    files.map((file) => access(file, constants.F_OK).then((_) => file))
   );
 }
 
