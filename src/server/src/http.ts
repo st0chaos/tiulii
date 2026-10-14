@@ -40,7 +40,7 @@ app.get(SSE_URL, async (c) => {
     }, 15 * 1000);
 
     const updateSub = currentHTML$.subscribe((html) => {
-      sendEvent(stream, { method: 'render', html: html ?? 'Null' });
+      sendEvent(stream, { method: 'render', html: html ?? '' });
     });
 
     const scrollSub = currentLine$.subscribe((line) => {
