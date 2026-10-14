@@ -20,7 +20,7 @@ export const configSchema = z
           .describe('Whether to enable table support.'),
         strikethrough: z
           .boolean()
-          .default(false)
+          .default(true)
           .describe('Whether to enable strikethrough text formatting.'),
         math: z
           .boolean()
@@ -36,7 +36,7 @@ export const configSchema = z
           .describe('Whether to parse front matter.'),
         attribute: z
           .boolean()
-          .default(true)
+          .default(false)
           .describe('Whether to parse attributes in curly brackets.'),
         mermaid: z
           .boolean()
