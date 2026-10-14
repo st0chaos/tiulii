@@ -51,12 +51,21 @@ export const parser: Parser = {
 };
 
 const rmd = new MarkdownIt('commonmark');
+
 rmd.enable('table');
+
 rmd.enable('strikethrough');
+
 rmd.use(markdownFrontMatter);
+
 rmd.use(markdownKaTeX, config.katex);
-rmd.use(markdownShiki, { ...config.shiki });
-rmd.use(markdownMermaid, { className: config.mermaid.class });
+
+rmd.use(markdownShiki, config.shiki);
+
+if (config.markdown.attribute) rmd.use(markdownItAttrs);
+
+if (config.mermaid.enable)
+  rmd.use(markdownMermaid, { className: config.mermaid.class });
 
 export const rmdParser: Parser = {
   parse(text) {
