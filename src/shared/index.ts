@@ -38,9 +38,26 @@ export const configSchema = z
           .boolean()
           .default(true)
           .describe('Whether to parse attributes in curly brackets.'),
+        mermaid: z
+          .boolean()
+          .default(true)
+          .describe('Whether to enable mermaid fenced code block.'),
       })
       .prefault({})
       .describe('Configuration options for Markdown extensions.'),
+    rmarkdown: z
+      .object({
+        attribute: z
+          .boolean()
+          .default(false)
+          .describe('Whether to parse attributes in curly brackets.'),
+        mermaid: z
+          .boolean()
+          .default(false)
+          .describe('Whether to enable mermaid fenced code block.'),
+      })
+      .prefault({})
+      .describe('Configuration options for R Markdown.'),
     scroll: z
       .object({
         threshold: z
@@ -79,10 +96,6 @@ it will scroll to the proportional position of the current line within the total
       ),
     mermaid: z
       .object({
-        enable: z
-          .boolean()
-          .default(true)
-          .describe('Whether to enable mermaid rendering.'),
         class: z
           .string()
           .trim()
