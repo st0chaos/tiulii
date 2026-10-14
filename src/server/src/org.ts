@@ -15,7 +15,7 @@ const processor = unified()
   .use(rehypeShiki, config.shiki)
   .use(stringify);
 
-const placeholder = `<div id="${randomUUIDv7}">The Org file is rendering...</div>`;
+const placeholder = `<!-- org-${randomUUIDv7} -->`;
 
 async function parseOrgToHtml(
   orgContent: string,

@@ -9,7 +9,7 @@ import { randomUUIDv7 } from 'node:crypto';
 
 const execFile = util.promisify(childProcess.execFile);
 
-const placeholder = `<div id="${randomUUIDv7}">The Rmarkdown is rendering...</div>`;
+const placeholder = `<!-- rmd-${randomUUIDv7} -->`;
 
 async function render(text: string, uri: string): Promise<Replacement> {
   const inputPath = fileURLToPath(uri);
