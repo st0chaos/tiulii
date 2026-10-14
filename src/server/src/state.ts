@@ -1,6 +1,5 @@
 import {
   BehaviorSubject,
-  bufferWhen,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
@@ -14,12 +13,13 @@ import {
   startWith,
   Subject,
   takeUntil,
-  timer,
   Observable,
   EMPTY,
-  switchMap,
   scan,
   merge,
+  share,
+  buffer,
+  switchMap,
 } from 'rxjs';
 import {
   type DidOpenTextDocumentParams,
@@ -86,31 +86,28 @@ const updates$: Observable<UpdateEvent> = open$.pipe(
       uri
     ).pipe(map((html) => ({ kind: 'html', uri: uri, html: html })));
 
-    const upcomingHTMLUpdate$: Observable<UpdateHTMLEvent> = change$
-      .pipe(
-        filter((params) => params.textDocument.uri === uri),
-        map((params) => params.contentChanges),
-        bufferWhen(() => {
-          const size = new TextEncoder().encode(textDocument.getText()).length;
-          if (size < 1024 * 1024 * 8) return timer(20);
-          return timer((size / 1024 ** 2) * 30);
-        }),
-        map((collection) => collection.flat()),
-        filter((changes) => changes.length !== 0),
-        map((changes) => {
-          TextDocument.update(textDocument, changes, version);
-          version++;
-          return textDocument.getText();
-        }),
-        switchMap((txt) => parseIntoStream(parser, txt, uri)),
-        map(
-          (html) => ({ kind: 'html', uri: uri, html: html }) as UpdateHTMLEvent
-        ),
-        takeUntil(closeThis$)
-      )
-      .pipe(
-        endWith({ kind: 'html', uri: uri, html: undefined } as UpdateHTMLEvent)
-      );
+    const changeThis$ = change$.pipe(
+      filter((params) => params.textDocument.uri === uri),
+      map((params) => params.contentChanges),
+      share()
+    );
+
+    const upcomingHTMLUpdate$: Observable<UpdateHTMLEvent> = changeThis$.pipe(
+      buffer(changeThis$.pipe(debounceTime(300))),
+      map((collection) => collection.flat()),
+      filter((changes) => changes.length !== 0),
+      map((changes) => {
+        TextDocument.update(textDocument, changes, version);
+        version++;
+        return textDocument.getText();
+      }),
+      switchMap((txt) => parseIntoStream(parser, txt, uri)),
+      map(
+        (html) => ({ kind: 'html', uri: uri, html: html }) as UpdateHTMLEvent
+      ),
+      takeUntil(closeThis$),
+      endWith({ kind: 'html', uri: uri, html: undefined } as UpdateHTMLEvent)
+    );
 
     const lineUpdate$: Observable<UpdateLineEvent> = cursorMoved$.pipe(
       filter((params) => params.uri === uri),
