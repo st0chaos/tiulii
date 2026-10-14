@@ -3,6 +3,8 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { env } from 'node:process';
 import { SERVER_NAME, configSchema } from '@tiulii/shared';
+import { tryAccessFiles } from './shared.ts';
+import { parse as parseYAML } from 'yaml';
 
 const possibleUserDirectories: (string | undefined)[] = [
   env[`${SERVER_NAME.toUpperCase()}_HOME`],
@@ -26,10 +28,21 @@ const userDirectory: string | undefined = (
   )
 ).find((result) => result !== undefined);
 
-export const config = configSchema.parse(
+const configFile =
   userDirectory === undefined
+    ? undefined
+    : await tryAccessFiles([
+        join(userDirectory, 'config.js'),
+        join(userDirectory, 'config.yaml'),
+        join(userDirectory, 'config.yml'),
+      ]).catch((_) => undefined);
+
+export const config = configSchema.parse(
+  configFile === undefined
     ? {}
-    : (await import(join(userDirectory, 'config.js'))).default
+    : configFile.endsWith('.js')
+      ? (await import(configFile)).default
+      : parseYAML(await fs.readFile(configFile, { encoding: 'utf8' }))
 );
 
 export const cssFileContent = await (async () => {

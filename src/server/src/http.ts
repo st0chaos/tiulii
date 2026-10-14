@@ -15,8 +15,7 @@ import { SSEStreamingApi, streamSSE } from 'hono/streaming';
 import { fileURLToPath } from 'node:url';
 import { Readable } from 'node:stream';
 import { createReadStream } from 'node:fs';
-import { access } from 'node:fs/promises';
-import constants from 'node:constants';
+import { tryAccessFiles } from './shared.ts';
 
 const app = new Hono();
 
@@ -81,12 +80,6 @@ app.get('/', (c) => {
     </html>
   `);
 });
-
-async function tryAccessFiles(files: string[]) {
-  return await Promise.any(
-    files.map((file) => access(file, constants.F_OK).then((_) => file))
-  );
-}
 
 app.get(':image{.+\\.(?:png|jpeg|gif|webp|bmp|avif|tiff|svg)$}', async (c) => {
   const activeURI = getActiveURI();

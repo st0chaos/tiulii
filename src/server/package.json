@@ -40,12 +40,13 @@
     "uniorg-parse": "^3.2.2",
     "uniorg-rehype": "^2.2.0",
     "vscode-languageserver": "^10.1.0",
-    "vscode-languageserver-textdocument": "^1.0.14"
+    "vscode-languageserver-textdocument": "^1.0.14",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
+    "@tiulii/shared": "*",
     "@types/node": "^26.4.0",
     "rolldown": "^1.2.7",
-    "@tiulii/shared": "*",
     "typescript": "6.0.3"
   }
 }

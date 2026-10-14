@@ -173,30 +173,30 @@ Add the following code to your `user-lisp-directory` or your init file.
 
 ## Configuration
 
-Tiulii looks for a JavaScript configuration file with a default export at
+Tiulii looks for a YAML file or a JavaScript file with a default export at
 
-- `$TIULII_HOME/config.js`
-- `$XDG_CONFIG_NAME/tiulii/config.js`
-- `~/.config/tiulii/config.js`
-- `~/.tiulii/config.js`
-
-For example,
-
-```javascript
-export default {
-  port: 8000, // Port on which the HTTP server listens.
-  style: './style.css',
-};
-```
+1. `$TIULII_HOME/config.(js|ya?ml)`
+2. `$XDG_CONFIG_NAME/tiulii/config.(js|ya?ml)`
+3. `~/.config/tiulii/config.(js|ya?ml)`
+4. `~/.tiulii/config.(js|ya?ml)`
 
 For more configuration options,
 visit the [Documentation](https://st0chaos.github.io/tiulii).
 
-### Style example
+### Example
 
-Here is my personal `style.css`.
+```yaml
+# config.yaml
+cssFile: ./style.css
+shiki:
+  theme: 'everforest-dark'
+mermaid:
+  options:
+    theme: 'forest'
+```
 
 ```css
+/* style.css */
 :root {
   --background: #ffffff;
   --surface: #f8f9fa;
