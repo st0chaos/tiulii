@@ -19,7 +19,7 @@
           pname = "tiulii";
           version = "0.1.0";
           src = ./.;
-          npmDepsHash = "sha256-3gWz1TtOJmfjJvJK4JM5lHY6Xgsdk59vwsr6UFNvyPg=";
+          npmDepsHash = "sha256-2Hy0rnL2w2L+gr4nItPSQvTTMDk8qy06LGRIX+DPEok=";
         };
         devShells.default = pkgs.mkShell {
           packages = [

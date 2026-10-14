@@ -22,7 +22,7 @@ Supported file formats and their features:
 | :--------- | :-----------: | :------------: | :---: | :-----------------: | :-----: |
 | Markdown   |      Yes      |      Yes       |  Yes  |         Yes         |   Yes   |
 | R Markdown |      Yes      |                |  Yes  |         Yes         |   Yes   |
-| Org        |      Yes      |                |  Yes  |         Yes         |         |
+| Org        |      Yes      |      Yes       |  Yes  |         Yes         |         |
 
 ## Installation
 
