@@ -143,6 +143,7 @@ interface ServerMessageRender {
 interface ServerMessageScroll {
   method: 'scroll';
   line: number;
+  maxLine: number;
 }
 
 export type ServerMessage = ServerMessageRender | ServerMessageScroll;

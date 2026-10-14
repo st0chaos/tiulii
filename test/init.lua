@@ -22,6 +22,7 @@ local cfg = {
       callback = function(ctx)
         client:notify(server_name .. '/didMoveCursor', {
           line = vim.fn.line('.'),
+          maxLine = vim.api.nvim_buf_line_count(ctx.buf),
           uri = vim.uri_from_bufnr(ctx.buf),
         })
       end,

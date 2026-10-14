@@ -32,8 +32,9 @@ import type { Parser } from './shared.js';
 import { config } from './config.ts';
 
 export interface DidMoveCursorParams {
-  line: number;
   uri: string;
+  line: number;
+  maxLine: number;
 }
 
 export const open$ = new Subject<DidOpenTextDocumentParams>();
@@ -63,10 +64,8 @@ interface UpdateHTMLEvent {
   uri: string;
   html: string | undefined;
 }
-interface UpdateLineEvent {
+interface UpdateLineEvent extends DidMoveCursorParams {
   kind: 'line';
-  uri: string;
-  line: number;
 }
 type UpdateEvent = UpdateHTMLEvent | UpdateLineEvent;
 
@@ -112,10 +111,7 @@ const updates$: Observable<UpdateEvent> = open$.pipe(
 
     const lineUpdate$: Observable<UpdateLineEvent> = cursorMoved$.pipe(
       filter((params) => params.uri === uri),
-      map(
-        (params) =>
-          ({ kind: 'line', uri, line: params.line }) as UpdateLineEvent
-      ),
+      map((params) => ({ kind: 'line', ...params }) as UpdateLineEvent),
       takeUntil(closeThis$)
     );
 
@@ -126,6 +122,7 @@ const updates$: Observable<UpdateEvent> = open$.pipe(
 interface DocumentData {
   html: string;
   line: number;
+  maxLine: number;
 }
 const docs$ = new BehaviorSubject<Record<string, DocumentData>>({});
 const uri$ = new BehaviorSubject<string | undefined>(undefined);
@@ -146,16 +143,16 @@ updates$.subscribe((event) => {
       if (origin) {
         docs$.next({ ...docs$.value, [uri]: { ...origin, html } });
       } else {
-        docs$.next({ ...docs$.value, [uri]: { html, line: 0 } });
+        docs$.next({ ...docs$.value, [uri]: { html, line: 0, maxLine: 0 } });
       }
       if (uri$.value === undefined) uri$.next(uri);
       break;
     }
     case 'line': {
-      const { uri, line } = event;
+      const { uri, line, maxLine } = event;
       const origin = docs$.value[uri];
       if (origin) {
-        docs$.next({ ...docs$.value, [uri]: { ...origin, line } });
+        docs$.next({ ...docs$.value, [uri]: { ...origin, line, maxLine } });
       }
       break;
     }
@@ -178,7 +175,7 @@ const latestDocument$ = combineLatest([docs$, uri$]).pipe(
 );
 
 export const currentLine$ = latestDocument$.pipe(
-  map((doc) => doc?.line),
+  map((doc) => (doc ? { line: doc.line, maxLine: doc.maxLine } : undefined)),
   distinctUntilChanged(),
   shareReplay(1)
 );
