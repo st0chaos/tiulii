@@ -26,6 +26,23 @@ async function mermaidRender(element: Element) {
   element.outerHTML = `<div ${lineAttrs}>${svg}</div>`;
 }
 
+function isHTMLOnlyCommentsAndWhitespaces(htmlString: string): boolean {
+  const fragment = document.createRange().createContextualFragment(htmlString);
+  const nodes = Array.from(fragment.childNodes);
+  if (nodes.length === 0) {
+    return false;
+  }
+  return nodes.every((node) => {
+    if (node.nodeType === Node.COMMENT_NODE) {
+      return true;
+    }
+    if (node.nodeType === Node.TEXT_NODE) {
+      return (node.textContent ?? '').trim() === '';
+    }
+    return false;
+  });
+}
+
 fetch(INIT_URL)
   .then((response) => response.json())
   .then((params: InitalizationParams) => {
@@ -50,7 +67,9 @@ fetch(INIT_URL)
     const registry: ServerMessageRegistry = {
       render(message) {
         app.style.minHeight = `${app.offsetHeight}px`;
-        app.innerHTML = message.html;
+        if (!isHTMLOnlyCommentsAndWhitespaces(message.html)) {
+          app.innerHTML = message.html;
+        }
 
         document.querySelectorAll('img').forEach((img) => {
           img.addEventListener('click', () => {
