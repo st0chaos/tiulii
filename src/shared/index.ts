@@ -73,7 +73,7 @@ it will scroll to the proportional position of the current line within the total
           ),
         top: z
           .number()
-          .default(0.1)
+          .default(-0.15)
           .describe(
             'Height between the top of viewport and the beginning of the block at cursor.'
           ),

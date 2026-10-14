@@ -43,6 +43,18 @@ function isHTMLOnlyCommentsAndWhitespaces(htmlString: string): boolean {
   });
 }
 
+/**
+ * Returns the distances from the top of the `documentElement` to the
+ * top and bottom borders of the element.
+ *
+ * This effectively provides the absolute vertical coordinates of the
+ * element.
+ */
+function getElementTopBottomRelativeToPage(element: Element): [number, number] {
+  const rect = element.getBoundingClientRect();
+  return [rect.top + window.scrollY, rect.bottom + window.scrollY];
+}
+
 fetch(INIT_URL)
   .then((response) => response.json())
   .then((params: InitalizationParams) => {
@@ -94,32 +106,74 @@ fetch(INIT_URL)
         }
       },
 
-      scroll(message) {
-        let target;
+      scroll({ line, maxLine }) {
+        let sup: Element | undefined, supEnd: number | undefined;
+        let inf: Element | undefined;
+        let perfect: Element | undefined;
         let ratio = 0;
-        for (const elm of app.querySelectorAll(
+
+        for (const element of app.querySelectorAll(
           `[${LINE_BEGIN_ATTR}][${LINE_END_ATTR}]`
         )) {
-          const beg = parseInt(elm.getAttribute(LINE_BEGIN_ATTR)!, 10);
-          const end = parseInt(elm.getAttribute(LINE_END_ATTR)!, 10);
-          if (beg <= message.line) {
-            target = elm;
-            if (end - beg < config.scroll.threshold) ratio = 0;
-            else ratio = (message.line - beg) / (end - beg);
-          } else {
+          const beg = parseInt(element.getAttribute(LINE_BEGIN_ATTR)!, 10);
+          const end = parseInt(element.getAttribute(LINE_END_ATTR)!, 10);
+          if (beg <= line && line <= end) {
+            perfect = element;
+            ratio =
+              end - beg < config.scroll.threshold
+                ? 0
+                : (line - beg) / (end - beg);
             break;
           }
+          if (beg <= line) {
+            sup = element;
+            supEnd = end;
+          } else {
+            inf = element;
+            supEnd = supEnd ?? 0;
+            ratio =
+              beg - supEnd < config.scroll.threshold
+                ? 0
+                : (line - supEnd) / (beg - supEnd);
+            break;
+          }
+          if (inf === undefined) {
+            ratio =
+              maxLine - supEnd < config.scroll.threshold
+                ? 0
+                : (line - supEnd) / (maxLine - supEnd);
+          }
         }
-        if (target) {
-          const rect = target.getBoundingClientRect();
-          // T is target top relative to viewport + height by which viewport scrolled.
-          // In other words, T is the top relative to the page.
-          const T = rect.top + window.scrollY;
-          const H = window.innerHeight * config.scroll.top; // Move viewport slightly up
+
+        if (perfect) {
+          const [top, btm] = getElementTopBottomRelativeToPage(perfect);
           window.scrollTo({
-            top: T - H + rect.height * ratio,
+            top: top + (btm - top) * (ratio + config.scroll.top),
             behavior: 'smooth',
           });
+          return;
+        }
+
+        if (inf) {
+          const btm = sup ? getElementTopBottomRelativeToPage(sup)[1] : 0;
+          const [top, _] = getElementTopBottomRelativeToPage(inf);
+          window.scrollTo({
+            top: btm + (top - btm) * (ratio + config.scroll.top),
+            behavior: 'smooth',
+          });
+          return;
+        }
+
+        if (!inf && sup) {
+          const [_, btm] = getElementTopBottomRelativeToPage(sup);
+          window.scrollTo({
+            top:
+              btm +
+              (document.documentElement.scrollHeight - btm) *
+                (ratio + config.scroll.top),
+            behavior: 'smooth',
+          });
+          return;
         }
       },
     };
