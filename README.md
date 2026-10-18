@@ -42,20 +42,6 @@ nix shell github:st0chaos/tiulii
 nix profile install github:st0chaos/tiulii
 ```
 
-### Build from source
-
-Ensure you have [Node.js](https://nodejs.org) installed, then build from source:
-
-```bash
-git clone https://github.com/st0chaos/tiulii.git --depth=1
-cd tiulii
-npm ci # or npm install
-npm run build
-
-# Link to your system path (or run directly via node ./dist/tiulii --stdio)
-ln --symbolic "$(realpath ./src/server/dist/cli.js)" /path/to/your/bin/tiulii
-```
-
 ## Usage
 
 ### Neovim 0.11+
@@ -112,7 +98,7 @@ vim.lsp.enable('tiulii')
 
 ### Emacs (Eglot)
 
-Add the following code to your `user-lisp-directory` or your init file.
+Add the following code at `user-lisp-directory` or the init file.
 
 ```elisp
 (defvar tiulii-preview-key "C-c v"
@@ -125,14 +111,12 @@ Add the following code to your `user-lisp-directory` or your init file.
 
 (defun tiulii--managed-p ()
   (member "tiulii" (process-command (jsonrpc--process (eglot-current-server)))))
-
 (defun tiulii--on-window-buffer-change (_frame)
   (let ((buffer (current-buffer))
         (file-name (buffer-file-name)))
     (when (and buffer file-name tiulii--flag)
       (jsonrpc-notify (eglot-current-server) :tiulii/didChangeView
                       `(:uri ,(eglot-path-to-uri file-name))))))
-
 (defun tiulii--on-idle-timeout ()
   (let ((buffer (current-buffer))
         (file-name (buffer-file-name)))
@@ -143,7 +127,6 @@ Add the following code to your `user-lisp-directory` or your init file.
                                       (widen)
                                       (count-lines (point-min) (point-max)))
                             :uri (eglot-path-to-uri file-name))))))
-
 (defun tiulii-preview ()
   (interactive)
   (jsonrpc-notify (eglot-current-server) :tiulii/openPreviewURL nil))
@@ -185,7 +168,7 @@ Tiulii looks for a YAML file or a JavaScript file with a default export at
 4. `~/.tiulii/config.(js|ya?ml)`
 
 For more configuration options,
-visit the [Documentation](https://st0chaos.github.io/tiulii).
+visit the [documentation](https://st0chaos.github.io/tiulii).
 
 ### Example
 
@@ -235,10 +218,6 @@ body {
   line-height: 1.6;
   max-width: 80ch;
   margin: 0 auto;
-  text-wrap: pretty;
-  text-align: justify;
-  hyphens: auto;
-  hanging-punctuation: allow-end last;
 }
 h1 {
   font-size: 2rem;
