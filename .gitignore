@@ -4,3 +4,4 @@ dist/
 *.tsbuildinfo
 /result
 *.knit.d/
+.npmrc
