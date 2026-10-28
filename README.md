@@ -154,8 +154,8 @@ Add the following code at `user-lisp-directory` or the init file.
                   (setq tiulii--timer nil))))))
 
 (with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs '(markdown-mode . ("tiulii" "--stdio")))
-  (add-to-list 'eglot-server-programs '(org-mode . ("tiulii" "--stdio"))))
+  (add-to-list 'eglot-server-programs
+               '((markdown-mode org-mode) . ("tiulii" "--stdio"))))
 ```
 
 ## Configuration
