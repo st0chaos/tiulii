@@ -43,8 +43,6 @@ function mathInlineTeX(state: StateInline, silent: boolean): boolean {
   if (!pos) return false;
   const [beg, end] = pos;
 
-  if (end - beg === 1) return false;
-
   if (silent) return true;
   const token = state.push(inlineMathTokenType, 'math', 0);
   token.markup = '$';
@@ -57,8 +55,6 @@ function mathDisplayTeX(state: StateInline, silent: boolean): boolean {
   const pos = findPairPosition(state, '$$', '$$');
   if (!pos) return false;
   const [beg, end] = pos;
-
-  if (end - beg === 2) return false;
 
   if (silent) return true;
   const token = state.push(displayMathTokenType, 'math', 0);
@@ -73,8 +69,6 @@ function mathInlineGithub(state: StateInline, silent: boolean): boolean {
   const pos = findPairPosition(state, '$`', '`$');
   if (!pos) return false;
   const [beg, end] = pos;
-
-  if (end - beg === 2) return false;
 
   if (silent) return true;
   const token = state.push(inlineMathTokenType, 'math', 0);
