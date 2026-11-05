@@ -30,8 +30,8 @@ if (config.markdown.strikethrough) md.enable('strikethrough');
 
 if (config.markdown.frontMatter) md.use(markdownFrontMatter);
 
-if (config.markdown.math) {
-  md.use(markdownTeX);
+if (config.markdown.math.enable) {
+  md.use(markdownTeX, config.markdown.math);
   md.use(markdownKaTeX, config.katex);
 }
 
@@ -61,10 +61,12 @@ rmd.enable('strikethrough');
 
 rmd.use(markdownFrontMatter);
 
-rmd.use(markdownTeX);
-rmd.use(markdownKaTeX, config.katex);
-
 rmd.use(markdownShiki, config.shiki);
+
+if (config.rmarkdown.math.enable) {
+  rmd.use(markdownTeX, config.rmarkdown.math);
+  rmd.use(markdownKaTeX, config.katex);
+}
 
 if (config.rmarkdown.attribute) rmd.use(markdownItAttrs);
 

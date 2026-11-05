@@ -1,5 +1,32 @@
 import { z } from 'zod';
 
+const mathConfigSchema = z
+  .object({
+    enable: z.boolean().default(true).describe('Whether to parse math.'),
+    texInline: z
+      .boolean()
+      .default(true)
+      .describe('Whether to parse TeX style inline math `$`.'),
+    texDisplay: z
+      .boolean()
+      .default(true)
+      .describe('Whether to parse TeX style display math `$$`.'),
+    latexInline: z
+      .boolean()
+      .default(false)
+      .describe('Whether to parse LaTeX style inline math `\\(`.'),
+    latexDisplay: z
+      .boolean()
+      .default(false)
+      .describe('Whether to parse LaTeX style display math `\\[`.'),
+    githubInline: z
+      .boolean()
+      .default(false)
+      .describe('Whether to parse GitHub style inline math `$\\``.'),
+  })
+  .prefault({})
+  .describe('Configuration options for math parsing.');
+
 export const configSchema = z
   .object({
     port: z
@@ -25,10 +52,7 @@ during which no editing to the document will trigger rendering.`),
           .boolean()
           .default(true)
           .describe('Whether to enable strikethrough text formatting.'),
-        math: z
-          .boolean()
-          .default(true)
-          .describe('Whether to enable math rendering.'),
+        math: mathConfigSchema,
         highlight: z
           .boolean()
           .default(true)
@@ -58,6 +82,7 @@ during which no editing to the document will trigger rendering.`),
           .boolean()
           .default(false)
           .describe('Whether to enable mermaid fenced code block.'),
+        math: mathConfigSchema,
       })
       .prefault({})
       .describe('Configuration options for R Markdown.'),

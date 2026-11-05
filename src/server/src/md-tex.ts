@@ -13,6 +13,14 @@ export const displayMathTokenType = 'display_math';
 //   return /^[\w\d]$/u.test(char);
 // }
 
+interface TeXOptions {
+  texInline: boolean;
+  texDisplay: boolean;
+  latexInline: boolean;
+  latexDisplay: boolean;
+  githubInline: boolean;
+}
+
 function findPairPosition(
   state: StateInline,
   open: string,
@@ -105,10 +113,17 @@ function mathInlineLaTeX(state: StateInline, silent: boolean): boolean {
   return true;
 }
 
-export default function (md: MarkdownIt) {
-  md.inline.ruler.after('escape', 'math_inline_github', mathInlineGithub);
-  md.inline.ruler.after('math_inline_github', 'math_inline_tex', mathInlineTeX);
-  md.inline.ruler.after('escape', 'math_display_tex', mathDisplayTeX);
-  md.inline.ruler.before('escape', 'math_display_latex', mathDisplayLaTeX);
-  md.inline.ruler.before('escape', 'math_inline_latex', mathInlineLaTeX);
+export default function (md: MarkdownIt, options?: TeXOptions) {
+  if (options?.texInline) {
+    const rule = options?.githubInline ? 'math_inline_github' : 'escape';
+    md.inline.ruler.after(rule, 'math_inline_tex', mathInlineTeX);
+  }
+  if (options?.texDisplay)
+    md.inline.ruler.after('escape', 'math_display_tex', mathDisplayTeX);
+  if (options?.latexInline)
+    md.inline.ruler.before('escape', 'math_inline_latex', mathInlineLaTeX);
+  if (options?.latexDisplay)
+    md.inline.ruler.before('escape', 'math_display_latex', mathDisplayLaTeX);
+  if (options?.githubInline)
+    md.inline.ruler.after('escape', 'math_inline_github', mathInlineGithub);
 }
