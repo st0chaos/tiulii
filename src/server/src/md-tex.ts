@@ -13,20 +13,18 @@ export const displayMathTokenType = 'display_math';
 //   return /^[\w\d]$/u.test(char);
 // }
 
-function mathInlineTeX(state: StateInline, silent: boolean): boolean {
-  const beg = state.pos;
-  if (state.src[beg] !== '$') return false;
+function findPairPosition(
+  state: StateInline,
+  open: string,
+  close: string
+): [number, number] | undefined {
+  const openLength = open.length;
 
-  // const lastToken = state.tokens.at(-1);
-  // if (lastToken?.type === "html_inline") {
-  //   // We may be inside of inside of inline html
-  //   if (/^<\w+.+[^/]>$/.test(lastToken.content)) {
-  //     return false;
-  //   }
-  // }
+  const beg = state.pos;
+  if (state.src.slice(beg, beg + openLength) !== open) return;
 
   let end = beg;
-  while ((end = state.src.indexOf('$', end + 1)) !== -1) {
+  while ((end = state.src.indexOf(close, end + openLength)) !== -1) {
     let backslash = 0;
     for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
       backslash++;
@@ -35,7 +33,15 @@ function mathInlineTeX(state: StateInline, silent: boolean): boolean {
       break;
     }
   }
-  if (end === -1) return false;
+  if (end === -1) return;
+
+  return [beg, end];
+}
+
+function mathInlineTeX(state: StateInline, silent: boolean): boolean {
+  const pos = findPairPosition(state, '$', '$');
+  if (!pos) return false;
+  const [beg, end] = pos;
 
   if (end - beg === 1) return false;
 
@@ -48,20 +54,9 @@ function mathInlineTeX(state: StateInline, silent: boolean): boolean {
 }
 
 function mathDisplayTeX(state: StateInline, silent: boolean): boolean {
-  const beg = state.pos;
-  if (state.src.slice(beg, beg + 2) !== '$$') return false;
-
-  let end = beg;
-  while ((end = state.src.indexOf('$$', end + 2)) !== -1) {
-    let backslash = 0;
-    for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
-      backslash++;
-    }
-    if (backslash % 2 === 0) {
-      break;
-    }
-  }
-  if (end === -1) return false;
+  const pos = findPairPosition(state, '$$', '$$');
+  if (!pos) return false;
+  const [beg, end] = pos;
 
   if (end - beg === 2) return false;
 
@@ -75,20 +70,9 @@ function mathDisplayTeX(state: StateInline, silent: boolean): boolean {
 }
 
 function mathInlineGithub(state: StateInline, silent: boolean): boolean {
-  const beg = state.pos;
-  if (state.src.slice(beg, beg + 2) !== '$`') return false;
-
-  let end = beg;
-  while ((end = state.src.indexOf('`$', end + 2)) !== -1) {
-    let backslash = 0;
-    for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
-      backslash++;
-    }
-    if (backslash % 2 === 0) {
-      break;
-    }
-  }
-  if (end === -1) return false;
+  const pos = findPairPosition(state, '$`', '`$');
+  if (!pos) return false;
+  const [beg, end] = pos;
 
   if (end - beg === 2) return false;
 
@@ -101,20 +85,9 @@ function mathInlineGithub(state: StateInline, silent: boolean): boolean {
 }
 
 function mathDisplayLaTeX(state: StateInline, silent: boolean): boolean {
-  const beg = state.pos;
-  if (state.src.slice(beg, beg + 2) !== '\\[') return false;
-
-  let end = beg;
-  while ((end = state.src.indexOf('\\]', end + 2)) !== -1) {
-    let backslash = 0;
-    for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
-      backslash++;
-    }
-    if (backslash % 2 === 0) {
-      break;
-    }
-  }
-  if (end === -1) return false;
+  const pos = findPairPosition(state, '\\[', '\\]');
+  if (!pos) return false;
+  const [beg, end] = pos;
 
   if (silent) return true;
   const token = state.push(displayMathTokenType, 'math', 0);
@@ -126,20 +99,9 @@ function mathDisplayLaTeX(state: StateInline, silent: boolean): boolean {
 }
 
 function mathInlineLaTeX(state: StateInline, silent: boolean): boolean {
-  const beg = state.pos;
-  if (state.src.slice(beg, beg + 2) !== '\\(') return false;
-
-  let end = beg;
-  while ((end = state.src.indexOf('\\)', end + 2)) !== -1) {
-    let backslash = 0;
-    for (let pos = end - 1; pos > beg && state.src[pos] === '\\'; pos--) {
-      backslash++;
-    }
-    if (backslash % 2 === 0) {
-      break;
-    }
-  }
-  if (end === -1) return false;
+  const pos = findPairPosition(state, '\\(', '\\)');
+  if (!pos) return false;
+  const [beg, end] = pos;
 
   if (silent) return true;
   const token = state.push(inlineMathTokenType, 'math', 0);
