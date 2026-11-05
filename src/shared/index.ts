@@ -39,9 +39,13 @@ export const configSchema = z
       .string()
       .optional()
       .describe('Path to the custom CSS file relative to the user directory.'),
-    debounceTime: z.number().min(0).default(300)
-      .describe(`The specific period of time (in millisecond)
-during which no editing to the document will trigger rendering.`),
+    debounceTime: z
+      .number()
+      .min(0)
+      .default(300)
+      .describe(
+        `The specific period of time (in millisecond) during which no editing to the document will trigger rendering.`
+      ),
     markdown: z
       .object({
         table: z
@@ -92,9 +96,7 @@ during which no editing to the document will trigger rendering.`),
           .int()
           .default(20)
           .describe(
-            `Threshold for enabling proportional scrolling.
-If the number of lines exceeds this value,
-it will scroll to the proportional position of the current line within the total line height.`
+            `Threshold for enabling proportional scrolling. If the number of lines exceeds this value, it will scroll to the proportional position of the current line within the total line height.`
           ),
         top: z
           .number()
