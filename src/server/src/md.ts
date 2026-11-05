@@ -2,7 +2,8 @@ import MarkdownIt from 'markdown-it';
 import { config } from './config.js';
 import { LINE_BEGIN_ATTR, LINE_END_ATTR } from '@tiulii/shared';
 import type { MarkdownParsingEnv, Parser } from './shared.js';
-import markdownKaTeX from './md-tex.js';
+import markdownTeX from './md-tex.js';
+import markdownKaTeX from './md-katex.js';
 import markdownFrontMatter from './md-fm.js';
 import markdownShiki from './md-shiki.js';
 import markdownItAttrs from 'markdown-it-attrs';
@@ -29,7 +30,10 @@ if (config.markdown.strikethrough) md.enable('strikethrough');
 
 if (config.markdown.frontMatter) md.use(markdownFrontMatter);
 
-if (config.markdown.math) md.use(markdownKaTeX, config.katex);
+if (config.markdown.math) {
+  md.use(markdownTeX);
+  md.use(markdownKaTeX, config.katex);
+}
 
 if (config.markdown.highlight)
   md.use(markdownShiki, {
@@ -57,6 +61,7 @@ rmd.enable('strikethrough');
 
 rmd.use(markdownFrontMatter);
 
+rmd.use(markdownTeX);
 rmd.use(markdownKaTeX, config.katex);
 
 rmd.use(markdownShiki, config.shiki);

@@ -1,10 +1,9 @@
 /* Copy and modify from microsoft/vscode-markdown-it-katex */
-import katex, { type KatexOptions } from 'katex';
-import type { MarkdownIt, StateInline, Token } from 'markdown-it';
+import type { MarkdownIt, StateInline } from 'markdown-it';
 
-const inlineMathTokenType = 'inline_math';
+export const inlineMathTokenType = 'inline_math';
 
-const displayMathTokenType = 'display_math';
+export const displayMathTokenType = 'display_math';
 
 // function isWhitespace(char: string): boolean {
 //   return /^\s$/u.test(char);
@@ -13,15 +12,6 @@ const displayMathTokenType = 'display_math';
 // function isWordCharacterOrNumber(char: string): boolean {
 //   return /^[\w\d]$/u.test(char);
 // }
-
-function escapeHtml(unsafe: string): string {
-  return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
 
 function mathInlineTeX(state: StateInline, silent: boolean): boolean {
   const beg = state.pos;
@@ -159,38 +149,10 @@ function mathInlineLaTeX(state: StateInline, silent: boolean): boolean {
   return true;
 }
 
-export default function (md: MarkdownIt, userOptions?: KatexOptions) {
+export default function (md: MarkdownIt) {
   md.inline.ruler.after('escape', 'math_inline_github', mathInlineGithub);
   md.inline.ruler.after('math_inline_github', 'math_inline_tex', mathInlineTeX);
   md.inline.ruler.after('escape', 'math_display_tex', mathDisplayTeX);
   md.inline.ruler.before('escape', 'math_display_latex', mathDisplayLaTeX);
   md.inline.ruler.before('escape', 'math_inline_latex', mathInlineLaTeX);
-
-  // Ensure `macros` property exists so that users can define their own macros
-  const options: KatexOptions = {
-    macros: {},
-    ...userOptions,
-  };
-
-  const inlineRenderer = (tokens: readonly Token[], idx: number) => {
-    const content = tokens[idx]!.content;
-    const latex = content;
-    try {
-      return katex.renderToString(latex, options);
-    } catch (error) {
-      return `<span title="${escapeHtml(latex)}">${escapeHtml(error + '')}</span>`;
-    }
-  };
-
-  const blockRenderer = (tokens: readonly Token[], idx: number) => {
-    const content = tokens[idx]!.content;
-    try {
-      return `<span>${katex.renderToString(content, { displayMode: true, ...options })}</span>`;
-    } catch (error) {
-      return `<span title="${escapeHtml(content)}">${escapeHtml(error + '')}</span>`;
-    }
-  };
-
-  md.renderer.rules[inlineMathTokenType] = inlineRenderer;
-  md.renderer.rules[displayMathTokenType] = blockRenderer;
 }
