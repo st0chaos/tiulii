@@ -3,7 +3,7 @@
   "version": "0.2.2",
   "type": "module",
   "main": "dist/cli.js",
-  "author": "st0chaos <git@st0chaos.win>",
+  "author": "st0chaos",
   "license": "GPL-3.0-or-later",
   "description": "A LSP server for previewing.",
   "scripts": {
