@@ -148,7 +148,7 @@ fetch(INIT_URL)
         if (perfect) {
           const [top, btm] = getElementTopBottomRelativeToPage(perfect);
           window.scrollTo({
-            top: top + (btm - top) * (ratio + config.scroll.top),
+            top: top + (btm - top) * ratio + config.scroll.offset,
             behavior: 'smooth',
           });
           return;
@@ -158,7 +158,7 @@ fetch(INIT_URL)
           const btm = sup ? getElementTopBottomRelativeToPage(sup)[1] : 0;
           const [top, _] = getElementTopBottomRelativeToPage(inf);
           window.scrollTo({
-            top: btm + (top - btm) * (ratio + config.scroll.top),
+            top: btm + (top - btm) * ratio + config.scroll.offset,
             behavior: 'smooth',
           });
           return;
@@ -169,8 +169,8 @@ fetch(INIT_URL)
           window.scrollTo({
             top:
               btm +
-              (document.documentElement.scrollHeight - btm) *
-                (ratio + config.scroll.top),
+              (document.documentElement.scrollHeight - btm) * ratio +
+              config.scroll.offset,
             behavior: 'smooth',
           });
           return;

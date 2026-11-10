@@ -98,11 +98,11 @@ export const configSchema = z
           .describe(
             `Threshold for enabling proportional scrolling. If the number of lines exceeds this value, it will scroll to the proportional position of the current line within the total line height.`
           ),
-        top: z
+        offset: z
           .number()
-          .default(-0.15)
+          .default(-50)
           .describe(
-            'Height between the top of viewport and the beginning of the block at cursor.'
+            'Height offset of the viewport. If 0, the top of viewport will be placed near the content at point.'
           ),
       })
       .prefault({})
