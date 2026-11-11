@@ -27,6 +27,9 @@
             pkgs.typescript-language-server
             pkgs.prettier
             pkgs.neovim
+            (pkgs.rWrapper.override {
+              packages = with pkgs.rPackages; [ knitr ];
+            })
           ];
         };
       }

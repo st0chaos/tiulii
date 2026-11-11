@@ -86,6 +86,12 @@ export const configSchema = z
           .boolean()
           .default(false)
           .describe('Whether to enable mermaid fenced code block.'),
+        outputDirectory: z
+          .string()
+          .default('{base}.knit.d')
+          .describe(
+            'Knitr output directory for each R Markdown file. If a relative path is specified, it is resolved relative to the directory of the R Markdown file being viewed. The placeholders `{path}`, `{dir}`, `{base}` can be used in this option string to represent absolute path, directory, base name of the current document, repectively.'
+          ),
         math: mathConfigSchema,
       })
       .prefault({})

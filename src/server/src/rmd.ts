@@ -3,31 +3,44 @@ import { rmdParser as markdownParser } from './md.js';
 import util from 'node:util';
 import childProcess from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { dirname, basename, join } from 'node:path';
+import { dirname, basename, join, isAbsolute, normalize } from 'node:path';
 import { readFile, mkdir } from 'node:fs/promises';
 import { randomUUIDv7 } from 'node:crypto';
+import { config } from './config.js';
 
 const execFile = util.promisify(childProcess.execFile);
 
 const placeholder = `<!-- rmd-${randomUUIDv7} -->`;
 
+function format(fmt: string, fields: Record<string, string>): string {
+  for (const [name, value] of Object.entries(fields)) {
+    fmt = fmt.replaceAll(name, value);
+  }
+  return fmt;
+}
+
 async function render(text: string, uri: string): Promise<Replacement> {
   const inputPath = fileURLToPath(uri);
-  const workingDirectory = dirname(inputPath);
-  const baseName = basename(inputPath);
-  const outputDirName = baseName + '.knit.d/';
-  const outputDirectory = join(workingDirectory, outputDirName);
-  const outPath = join(outputDirectory, baseName + '.knit.md');
+  const inputDir = dirname(inputPath);
+  const inputBase = basename(inputPath);
+
+  const dir = format(normalize(config.rmarkdown.outputDirectory), {
+    '{path}': inputPath,
+    '{dir}': inputDir,
+    '{base}': inputBase,
+  });
+
+  const outBaseDir = isAbsolute(dir) ? dir : join(inputDir, dir);
+  const outMDPath = join(outBaseDir, 'out.md');
   try {
     const knitScript = `
-    library(knitr);
-    opts_knit$set(base.dir="${workingDirectory}");
-    opts_chunk$set(fig.path="${outputDirName}");
-    knit(text=r"--------[${text}]--------", output="${outPath}");
+      library(knitr);
+      opts_knit$set(base.dir="${outBaseDir}");
+      knit(text=r"--------[${text}]--------", output="${outMDPath}");
     `;
-    await mkdir(outputDirectory, { recursive: true });
+    await mkdir(dirname(outMDPath), { recursive: true });
     await execFile('Rscript', ['-e', knitScript]);
-    const mdtext = await readFile(outPath, { encoding: 'utf8' });
+    const mdtext = await readFile(outMDPath, { encoding: 'utf8' });
     return {
       placeholder,
       content: await waitParseResult(markdownParser.parse(mdtext, uri)),
